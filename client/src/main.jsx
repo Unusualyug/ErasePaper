@@ -345,7 +345,13 @@ function ClientRoot() {
     api
       .get('/config')
       .then(({ data }) => setMode(data.mode))
-      .catch(() => setError('The application server is not available. Please try again in a moment.'));
+      .catch(() => {
+        if (import.meta.env.PROD && window.location.pathname === '/') {
+          setMode('live');
+          return;
+        }
+        setError('The application server is not available. Please try again in a moment.');
+      });
   }
   useEffect(load, []);
   return (
