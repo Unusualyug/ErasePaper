@@ -6,3 +6,5 @@ Disallow: /dashboard
 Disallow: /requests
 Disallow: /profile
 Disallow: /auth/
+
+Sitemap: https://erasepaper.onrender.com/sitemap.xml
