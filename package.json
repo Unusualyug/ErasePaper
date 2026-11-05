@@ -1,0 +1,26 @@
+{
+  "name": "erasepaper",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev": "concurrently -k -n API,WEB -c blue,magenta \"npm run dev -w server\" \"npm run dev -w client\"",
+    "build": "npm run build -w client",
+    "start": "npm run start -w server",
+    "test": "npm run test -w server && node --test client/tests/*.test.js",
+    "admin:create": "npm run admin:create -w server --",
+    "seed": "npm run seed -w server",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "prettier": "^3.9.10"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  }
+}

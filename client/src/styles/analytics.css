@@ -1,0 +1,88 @@
+/* Website analytics charts use theme-aware tokens and remain scroll-safe on narrow screens. */
+.analytics-trend-svg {
+  display: block;
+  width: 100%;
+  min-width: 560px;
+  height: auto;
+  overflow: visible;
+}
+.analytics-chart-grid {
+  stroke: var(--ep-border);
+  stroke-width: 1;
+  stroke-dasharray: 3 5;
+}
+.analytics-chart-label {
+  fill: var(--ep-text-secondary);
+  font-family: inherit;
+  font-size: 10px;
+}
+.analytics-chart-line {
+  fill: none;
+  stroke: #8b78f4;
+  stroke-width: 3;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+.analytics-chart-point {
+  fill: var(--ep-surface);
+  stroke: #8b78f4;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+.analytics-toggle-group {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--ep-border);
+  border-radius: 9px;
+  background: var(--ep-surface-muted);
+}
+.analytics-toggle-group button {
+  min-height: 31px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ep-text-secondary);
+  font-size: 10px;
+  font-weight: 600;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+}
+.analytics-toggle-group button:hover {
+  color: var(--ep-text-primary);
+}
+.analytics-toggle-group button[aria-pressed='true'] {
+  background: #6c57db;
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 16%);
+}
+[data-theme='light'] .admin-shell .text-blue-300 {
+  color: #2563eb !important;
+}
+[data-theme='light'] .admin-shell .text-teal-300 {
+  color: #0f766e !important;
+}
+[data-theme='light'] .admin-shell .text-amber-300 {
+  color: #a16207 !important;
+}
+[data-theme='light'] .admin-shell .text-emerald-300 {
+  color: #047857 !important;
+}
+[data-theme='light'] .admin-shell .text-rose-400 {
+  color: #be123c !important;
+}
+@media (max-width: 1023px) {
+  .analytics-toggle-group button {
+    min-height: 44px;
+    padding-inline: 12px;
+    font-size: 12px;
+  }
+}
+@media (max-width: 640px) {
+  .analytics-trend-svg {
+    min-width: 520px;
+  }
+}

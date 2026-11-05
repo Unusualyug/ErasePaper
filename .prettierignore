@@ -1,0 +1,8 @@
+node_modules
+client/dist
+package-lock.json
+artifacts
+docs/screenshots
+server/private-uploads
+server/.test-uploads
+qa-output/lighthouse-*.json

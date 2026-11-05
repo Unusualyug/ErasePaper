@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+client/.env*
+!client/.env.example
+server/.env*
+!server/.env.example
+server/private-uploads/
+server/.test-uploads/
+artifacts/
+*.log
+coverage/
+.DS_Store
