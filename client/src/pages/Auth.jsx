@@ -186,7 +186,9 @@ function AuthScreen({ intent = 'signin' }) {
                 required
                 maxLength={254}
               />
-              {signup && <p className="hint">Used for sign-in. This email address is not verified.</p>}
+              {signup && (
+                <p className="hint">Used for sign-in and service emails. This address is not verified.</p>
+              )}
             </div>
 
             {signup && (

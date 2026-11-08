@@ -36,7 +36,7 @@ const faqs = [
   ],
   [
     'How do I get started?',
-    'Create an account with an email, username, mobile number, and password. Email and phone are not verified, and no email or SMS is sent. Then submit a short service request or contact us directly on WhatsApp to discuss your requirements.',
+    'Create an account with an email, username, mobile number, and password. Email and phone are not verified. When live email delivery is configured, we send a welcome email and a receipt when you submit a service request; no email-verification message, OTP, or SMS is sent. The demo sends no emails. Then submit a short service request or contact us directly on WhatsApp to discuss your requirements.',
   ],
   [
     'Is manual creation really included with bulk printing?',
@@ -48,7 +48,7 @@ const faqs = [
   ],
   [
     'Is my personal information secure?',
-    'ErasePaper uses your email address and password to sign you in. Passwords are stored as one-way hashes, and your requests are accessible only to you and authorized administrators. Email addresses and mobile numbers are not verified; no email or SMS is sent.',
+    'ErasePaper uses your email address and password to sign you in. Passwords are stored as one-way hashes, and your requests are accessible only to you and authorized administrators. Email addresses and mobile numbers are not verified. When live email delivery is configured, welcome and service-request receipt emails may be sent; no verification email or SMS is sent.',
   ],
 ];
 function ServiceCard({ service, index, user }) {
@@ -373,7 +373,7 @@ export default function Home() {
               [
                 UserRoundPlus,
                 'Make yourself at home',
-                'Create your account with an email address, username, mobile number, and password. Email is not verified; no email, OTP, or SMS is sent.',
+                'Create your account with an email address, username, mobile number, and password. Email is not verified. When live email delivery is configured, you receive a welcome email and a service-request receipt; no verification email, OTP, or SMS is sent.',
               ],
               [
                 Send,

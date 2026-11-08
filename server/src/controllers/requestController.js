@@ -12,6 +12,7 @@ import {
 import { publicRequest } from '../utils/serializers.js';
 import { AppError } from '../utils/errors.js';
 import { saveAttachments, removeAttachments } from '../services/uploads.js';
+import { sendRequestEmails } from '../services/email.js';
 
 export function createRequestController(store) {
   async function accessible(id, user) {
@@ -92,6 +93,7 @@ export function createRequestController(store) {
           );
           return created;
         });
+        void sendRequestEmails({ user: req.user, requestId: request.requestId, serviceName: service.name });
         res.status(201).json({ request: publicRequest(request) });
       } catch (error) {
         await removeAttachments(attachments);

@@ -5,6 +5,7 @@ import { AppError } from '../utils/errors.js';
 import { hashPassword, verifyPassword } from '../utils/passwords.js';
 import { phoneSchema } from '../utils/validators.js';
 import { publicUser } from '../utils/serializers.js';
+import { sendWelcomeEmail } from '../services/email.js';
 
 const usernameSchema = z
   .string()
@@ -86,6 +87,7 @@ export function createAuthController(store, auth) {
         targetId: user.studentId,
       });
       await auth.createSession(user, res);
+      void sendWelcomeEmail(user);
       res.status(201).json({ user: publicUser(user), mode: config.demo ? 'demo' : 'live' });
     },
 

@@ -12,7 +12,7 @@ function LegalPage({ title, eyebrow, intro, children }) {
       <p className="eyebrow mt-9">{eyebrow}</p>
       <h1 className="mt-3 text-3xl font-bold tracking-[-.04em] sm:text-4xl">{title}</h1>
       <p className="legal-intro mt-4 max-w-3xl text-sm leading-7">{intro}</p>
-      <p className="legal-updated mt-4 text-xs">Last updated: 4 November 2026</p>
+      <p className="legal-updated mt-4 text-xs">Last updated: 3 November 2026</p>
       <div className="legal-content mt-9 space-y-8">{children}</div>
       <div className="legal-contact mt-12 rounded-2xl border p-5 sm:p-6">
         <ShieldCheck className="mb-3 text-brand-600" size={21} />
@@ -45,10 +45,13 @@ export function PrivacyPolicy() {
       <Section title="Information we process">
         <p>
           When you create an account, we process your email address, username, mobile number, password hash,
-          and account and sign-in timestamps. Email addresses and mobile numbers are not verified; no email,
-          SMS or OTP is sent. Your email address is used for sign-in. We also process profile details, service
-          selections, request titles and descriptions, service-specific requirements, status history, messages
-          you send to us and files you choose to upload.
+          and account and sign-in timestamps. Email addresses and mobile numbers are not verified and are not
+          proof of identity. Your email address is used for sign-in. When live email delivery is configured,
+          ErasePaper sends a welcome email after registration and a receipt after a service request is
+          submitted; these are not verification messages. No email-verification code, OTP or SMS is sent, and
+          the demo sends no emails. We also process profile details, service selections, request titles and
+          descriptions, service-specific requirements, status history, messages you send to us and files you
+          choose to upload.
         </p>
         <p>
           Administrators may add private operational notes to a request. Security and audit records may
@@ -70,11 +73,15 @@ export function PrivacyPolicy() {
       </Section>
       <Section title="Service providers and storage">
         <p>
-          ErasePaper manages email-and-password authentication and server-side sessions. Student profiles,
-          service requests, notifications and application records are stored in MongoDB; the live deployment
-          is intended to use MongoDB Atlas. Uploaded files are held in private application storage configured
-          by the operator. The exact hosting, storage region and retention settings depend on the deployment
-          selected by ErasePaper.
+          ErasePaper manages email-and-password authentication and server-side sessions. When enabled in the
+          live deployment, transactional email is delivered through Resend's HTTPS API using a sending domain
+          configured by the operator. Welcome messages contain the account name; request receipts contain the
+          request ID and service name; an operational alert sent to ErasePaper support contains the student's
+          username, email address, request ID and service name. Resend processes these messages to deliver
+          them under its own terms and privacy policy. Student profiles, service requests, notifications and
+          application records are stored in MongoDB; the live deployment is intended to use MongoDB Atlas.
+          Uploaded files are held in private application storage configured by the operator. The exact
+          hosting, storage region and retention settings depend on the deployment selected by ErasePaper.
         </p>
         <p>
           If you choose to contact us through WhatsApp, that conversation is handled by WhatsApp under its own
@@ -206,11 +213,12 @@ export function CookiePolicy() {
       </Section>
       <Section title="Authentication sessions">
         <p>
-          ErasePaper manages email-and-password authentication. Email addresses are not verified. Session
-          cookies are HTTP-only and SameSite=Lax, expire after seven days and are marked Secure in production.
-          Passwords are stored as salted one-way hashes; raw passwords and session tokens are not placed in
-          browser storage readable by page scripts. The demo is isolated and in-memory and should not be used
-          with real student information.
+          ErasePaper manages email-and-password authentication; email addresses are not verified, and the
+          welcome/request messages do not prove ownership of an address. Session cookies are HTTP-only and
+          SameSite=Lax, expire after seven days and are marked Secure in production. Passwords are stored as
+          salted one-way hashes; raw passwords and session tokens are not placed in browser storage readable
+          by page scripts. The demo is isolated, in-memory, and sends no transactional email; it should not be
+          used with real student information.
         </p>
       </Section>
     </LegalPage>

@@ -4,13 +4,13 @@
 
 Built with MongoDB, Express, React, Node.js, Tailwind CSS, Framer Motion, Axios, React Router, Lucide React, react-countup and AutoAnimate. Authentication is managed locally by the ErasePaper server; no third-party identity provider is required.
 
-> **Start here:** the included preview runs in an explicitly labeled, in-memory demo. It does not send SMS or connect to a database. Live operation requires your own MongoDB URI and a strong session secret. The application has not been deployed to your production accounts.
+> **Start here:** the included preview runs in an explicitly labeled, in-memory demo. It does not send email or SMS or connect to a database. Live operation requires your own MongoDB URI and a strong session secret. The application has not been deployed to your production accounts.
 
 ## Explore the application
 
 - `/` — public homepage and five services
-- `/sign-up` — username, mobile number and password registration
-- `/sign-in` — username/password sign-in; demo student/admin shortcuts appear only in demo mode
+- `/sign-up` — email, username, mobile number and password registration
+- `/sign-in` — email/password sign-in; the demo student shortcut appears only in demo mode
 - `/dashboard`, `/requests`, `/requests/new`, `/profile` — student workspace
 - `/admin` — overview, service statistics, recent activity and deletion recovery
 - `/admin/students` — search, date filters, pagination and student details
@@ -20,7 +20,7 @@ Built with MongoDB, Express, React, Node.js, Tailwind CSS, Framer Motion, Axios,
 - `/admin/settings` — local theme, cookie consent and authentication information
 - `/privacy-policy`, `/cookie-policy`, `/terms-and-conditions` — public legal and privacy pages
 
-Signup collects a username, mobile number and password. **Mobile numbers are not verified and no SMS or OTP is sent.** The app currently has no automated password-reset flow; contact the operator if an account is locked out.
+Signup requires an email address, username, mobile number and password. Email is used for sign-in but is **not verified**; mobile numbers are also **not verified**. When live Resend delivery is configured, the app sends a welcome email on signup and a receipt plus support alert for a new service request; it does not send verification codes, OTPs or SMS. The demo sends no emails. Existing accounts without an email can add one from their profile while an active session remains; accounts without an active session may need operator-assisted recovery. The app has no automated password-reset or email-verification flow.
 
 In demo mode, choose **Student demo** or create a local test account. The public demo does not expose an Admin login or Admin role selector. Demo accounts and changes are held in memory and reset when the API restarts. The initial dataset contains 24 illustrative students and 48 requests. Do not enter real student information into the demo.
 
@@ -79,7 +79,7 @@ The new local-auth implementation uses separate collections for accounts and acc
 ### Student experience
 
 - Responsive homepage, original inline SVG logo, locally served Inter font and optimized hero image.
-- Locally managed username/password sign-up and sign-in; password hashes are generated server-side; session cookies are HTTP-only.
+- Locally managed email/password sign-in and email-required registration; passwords are hashed server-side and persistent sessions use HTTP-only cookies.
 - Profile editing, account creation date, mobile contact and sign-out.
 - Dashboard totals, recent requests and service shortcuts.
 - Service-specific validated fields, deadline/copy/binding/delivery/project information as appropriate.

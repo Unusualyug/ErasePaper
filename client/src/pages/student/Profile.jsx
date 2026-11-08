@@ -176,8 +176,8 @@ export default function Profile() {
                   </div>
                   <p className="hint">
                     {user?.email
-                      ? 'Used for email-only sign-in. This address is not verified.'
-                      : 'Add an email before your current session ends so you can sign in again. This address is not verified.'}
+                      ? 'Used for email-only sign-in and service emails. This address is not verified.'
+                      : 'Add an email before your current session ends so you can sign in again and receive service emails. This address is not verified.'}
                   </p>
                 </div>
                 <div className="grid gap-5 border-t border-slate-100 pt-5 sm:grid-cols-2">
