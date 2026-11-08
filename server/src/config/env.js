@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../');
 dotenv.config({ path: path.join(root, '.env'), quiet: true });
+
 const production = process.env.NODE_ENV === 'production';
 const demo = !production && process.env.DEMO_MODE === 'true';
 const sessionSecret = process.env.SESSION_SECRET || (demo ? randomBytes(32).toString('hex') : '');
@@ -12,6 +13,7 @@ const origins = (process.env.CLIENT_ORIGIN || (!production ? 'http://localhost:5
   .split(',')
   .map((value) => value.trim())
   .filter(Boolean);
+
 const config = {
   root,
   production,
@@ -23,6 +25,12 @@ const config = {
   whatsapp: (process.env.WHATSAPP_NUMBER || '919825751614').replace(/\D/g, ''),
   uploadDir: path.resolve(root, process.env.UPLOAD_DIR || './private-uploads'),
   trustProxy: Number(process.env.TRUST_PROXY || 0),
+
+  // Resend transactional email configuration; the API key stays server-side.
+  resendApiKey: process.env.RESEND_API_KEY || '',
+  emailFrom: process.env.EMAIL_FROM || 'ErasePaper <notifications@mail.erasepaper.online>',
+  emailReplyTo: process.env.EMAIL_REPLY_TO || 'support@erasepaper.online',
+  supportEmail: process.env.SUPPORT_EMAIL || 'support@erasepaper.online',
 };
 
 if (!demo && (!config.mongoUri || !config.sessionSecret)) {
