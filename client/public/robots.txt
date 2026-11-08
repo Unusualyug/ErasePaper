@@ -7,4 +7,4 @@ Disallow: /requests
 Disallow: /profile
 Disallow: /auth/
 
-Sitemap: https://erasepaper.onrender.com/sitemap.xml
+Sitemap: https://erasepaper.online/sitemap.xml
