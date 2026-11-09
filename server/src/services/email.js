@@ -154,14 +154,17 @@ export async function sendWelcomeEmail(user) {
   const username = String(user.username || 'there');
   const safeUsername = escapeHtml(username);
   const signInUrl = 'https://erasepaper.online/sign-in';
+  const forgotPasswordUrl = 'https://erasepaper.online/forgot-password';
+  const safeEmail = escapeHtml(String(user.email));
   const note =
     'Your account is ready to use right away. Email addresses are not verified, and this message is not an email-verification request.';
+  const signInDetails = `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:21px;border:1px solid ${BRAND.line};border-radius:12px;"><tr><td style="padding:15px 17px;"><div style="font-size:10px;line-height:15px;font-weight:700;letter-spacing:.8px;color:${BRAND.muted};text-transform:uppercase;">Your sign-in email</div><div style="padding-top:8px;font-size:14px;line-height:21px;font-weight:700;color:${BRAND.ink};word-break:break-word;">${safeEmail}</div></td></tr></table><p style="margin:16px 0 0;font-size:13px;line-height:21px;color:${BRAND.muted};">For your security, we never send your password by email. If you forget it, <a href="${escapeHtml(forgotPasswordUrl)}" style="color:${BRAND.purple};font-weight:700;text-decoration:underline;">request a password reset link</a> from the sign-in page.</p>`;
   const html = brandedEmail({
-    preview: 'Your ErasePaper account is ready. Sign in to explore your academic support workspace.',
+    preview: 'Your ErasePaper account is ready. Your sign-in email and account security details are inside.',
     label: 'Account created',
     title: 'Welcome to ErasePaper',
     intro: `<p style="margin:0 0 12px;font-size:15px;line-height:24px;color:${BRAND.ink};">Hi ${safeUsername},</p><p style="margin:0;font-size:14px;line-height:23px;color:${BRAND.muted};">Your account is ready. Explore services, submit a request, and follow its progress from your dashboard.</p>`,
-    content: '',
+    content: signInDetails,
     buttonUrl: signInUrl,
     buttonLabel: 'Open your account',
     note,
@@ -171,7 +174,7 @@ export async function sendWelcomeEmail(user) {
   return sendEmail({
     to: user.email,
     subject: 'Welcome to ErasePaper — your account is ready',
-    text: `Hi ${username},\n\nWelcome to ErasePaper. Your account is ready. Explore services, submit a request, and follow its progress at ${signInUrl}.\n\nYour account is ready to use right away. Email addresses are not verified, and this message is not an email-verification request.\n\nNeed help? Reply to this email or contact ${BRAND.support}.\n\nErasePaper · Simplifying Academic Life`,
+    text: `Hi ${username},\n\nWelcome to ErasePaper. Your account is ready. Explore services, submit a request, and follow its progress from your dashboard at ${signInUrl}.\n\nYour sign-in email: ${user.email}\n\nFor your security, we never send your password by email. If you forget it, request a password reset link at ${forgotPasswordUrl}.\n\nYour account is ready to use right away. Email addresses are not verified, and this message is not an email-verification request.\n\nNeed help? Reply to this email or contact ${BRAND.support}.\n\nErasePaper · Simplifying Academic Life`,
     html,
   });
 }
