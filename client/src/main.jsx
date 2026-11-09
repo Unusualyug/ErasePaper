@@ -34,6 +34,8 @@ import AnalyticsTracker from './components/AnalyticsTracker';
 import PaperCurlIntro from './components/PaperCurlIntro';
 const Home = lazy(() => import('./pages/Home'));
 const Auth = lazy(() => import('./pages/Auth'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const Dashboard = lazy(() => import('./pages/student/Dashboard'));
 const Requests = lazy(() => import('./pages/student/Requests'));
 const NewRequest = lazy(() => import('./pages/student/NewRequest'));
@@ -255,6 +257,8 @@ function AppRoutes() {
             <Route path="privacy-policy" element={<PrivacyPolicy />} />
             <Route path="cookie-policy" element={<CookiePolicy />} />
             <Route path="terms-and-conditions" element={<TermsAndConditions />} />
+            <Route path="forgot-password" element={<ForgotPassword />} />
+            <Route path="reset-password" element={<ResetPassword />} />
             <Route
               path="sign-in"
               element={
@@ -346,6 +350,8 @@ function ClientRoot() {
       .get('/config')
       .then(({ data }) => setMode(data.mode))
       .catch(() => {
+        // Keep the public landing page visible if the free service is waking up or
+        // the config endpoint is temporarily unavailable. Production is always live mode.
         if (import.meta.env.PROD && window.location.pathname === '/') {
           setMode('live');
           return;

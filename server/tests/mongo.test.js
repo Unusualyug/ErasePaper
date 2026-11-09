@@ -5,9 +5,10 @@ import { MongoMemoryReplSet } from 'mongodb-memory-server';
 import { createMongoStore } from '../src/repositories/mongoStore.js';
 import { createDeletionService } from '../src/services/deletion.js';
 import { dateKeyInIndia, getAnalyticsRange } from '../src/services/analytics.js';
-import { hashPassword } from '../src/utils/passwords.js';
+import { hashPassword, verifyPassword } from '../src/utils/passwords.js';
 import AnalyticsPageView from '../src/models/AnalyticsPageView.js';
 import AnalyticsSession from '../src/models/AnalyticsSession.js';
+import PasswordResetToken from '../src/models/PasswordResetToken.js';
 
 let replSet, connection, store;
 before(async () => {
@@ -117,6 +118,101 @@ test('local repository enforces username and email uniqueness, allows shared pho
     1,
   );
   assert.equal((await store.requests.list({ page: 1, limit: 10 })).total, 0);
+});
+
+test('Mongo reset-token repository replaces, expires, and atomically consumes one hashed token per user', async () => {
+  const user = await newUser('token_store_user', '+919123456709', { email: 'reset.mongo@example.com' });
+  const previousHash = 'a'.repeat(64);
+  const currentHash = 'b'.repeat(64);
+  const expiresAt = new Date(Date.now() + 20 * 60 * 1000);
+
+  await store.passwordResetTokens.replaceForUser(user._id, { tokenHash: previousHash, expiresAt });
+  await store.passwordResetTokens.replaceForUser(user._id, { tokenHash: currentHash, expiresAt });
+  assert.equal(await PasswordResetToken.countDocuments({ userId: user._id }), 1);
+  assert.equal(
+    await store.passwordResetTokens.consume(previousHash),
+    null,
+    'replacing a link invalidates the old hash',
+  );
+
+  const indexes = await PasswordResetToken.collection.indexes();
+  assert.ok(indexes.some((index) => index.unique && index.key.tokenHash === 1));
+  assert.ok(indexes.some((index) => index.unique && index.key.userId === 1));
+  assert.ok(
+    indexes.some((index) => index.key.expiresAt === 1 && index.expireAfterSeconds === 0),
+    'the stored token has a MongoDB expiry index',
+  );
+
+  const consumed = await store.passwordResetTokens.consume(currentHash);
+  assert.equal(consumed.tokenHash, currentHash);
+  assert.equal(String(consumed.userId), String(user._id));
+  assert.equal(
+    await store.passwordResetTokens.consume(currentHash),
+    null,
+    'a consumed token cannot be reused',
+  );
+
+  const expiredHash = 'c'.repeat(64);
+  await store.passwordResetTokens.replaceForUser(user._id, {
+    tokenHash: expiredHash,
+    expiresAt: new Date(Date.now() - 1000),
+  });
+  assert.equal(
+    await store.passwordResetTokens.consume(expiredHash),
+    null,
+    'expiry is enforced before TTL cleanup',
+  );
+});
+
+test('Mongo password reset atomically updates the password and revokes sessions', async () => {
+  const user = await newUser('reset_transaction_user', '+919123456710', {
+    email: 'reset.transaction@example.com',
+  });
+  const previousPassword = 'Long-Unique-Test-2026!';
+  const nextPassword = 'New-Transaction-Password-2026!';
+  const resetHash = 'd'.repeat(64);
+  const sessionHash = 'e'.repeat(64);
+  const now = new Date();
+  await store.passwordResetTokens.replaceForUser(user._id, {
+    tokenHash: resetHash,
+    expiresAt: new Date(now.getTime() + 20 * 60 * 1000),
+  });
+  await store.sessions.create({
+    tokenHash: sessionHash,
+    userId: user._id,
+    expiresAt: new Date(now.getTime() + 24 * 60 * 60 * 1000),
+  });
+  const newPasswordHash = await hashPassword(nextPassword);
+
+  const updateResetState = async (tx) => {
+    const token = await store.passwordResetTokens.consume(resetHash, now, tx);
+    assert.ok(token);
+    await store.users.update(user._id, { passwordHash: newPasswordHash }, tx);
+    await store.sessions.removeForUser(user._id, tx);
+    await store.passwordResetTokens.deleteForUser(user._id, tx);
+  };
+
+  await assert.rejects(
+    store.withTransaction(async (tx) => {
+      await updateResetState(tx);
+      throw new Error('Intentional password-reset rollback');
+    }),
+  );
+  assert.equal(await PasswordResetToken.countDocuments({ userId: user._id }), 1);
+  assert.ok(await store.sessions.findByTokenHash(sessionHash));
+  assert.equal(
+    await (
+      await store.users.findByUsernameNormalized('reset_transaction_user')
+    ).passwordHash,
+    user.passwordHash,
+  );
+
+  await store.withTransaction(updateResetState);
+  assert.equal(await PasswordResetToken.countDocuments({ userId: user._id }), 0);
+  assert.equal(await store.sessions.findByTokenHash(sessionHash), null);
+  const updatedUser = await store.users.findByUsernameNormalized('reset_transaction_user');
+  assert.equal(await verifyPassword(nextPassword, updatedUser.passwordHash), true);
+  assert.equal(await verifyPassword(previousPassword, updatedUser.passwordHash), false);
 });
 
 test('real MongoDB transaction rolls back all related writes on failure', async () => {

@@ -50,6 +50,7 @@ export function createDeletionService(store) {
             ]),
           ];
           await store.sessions.removeForUser(job.userId, tx);
+          await store.passwordResetTokens.deleteForUser(job.userId, tx);
           await store.notifications.removeForUser(job.userId, tx);
           await store.requests.removeForUser(job.userId, tx);
           await store.users.remove(job.userId, tx);

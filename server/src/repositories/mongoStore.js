@@ -6,6 +6,7 @@ import Notification from '../models/Notification.js';
 import AdminLog from '../models/AdminLog.js';
 import DeletionJob from '../models/DeletionJob.js';
 import AuthSession from '../models/AuthSession.js';
+import PasswordResetToken from '../models/PasswordResetToken.js';
 import AnalyticsVisitor from '../models/AnalyticsVisitor.js';
 import AnalyticsSession from '../models/AnalyticsSession.js';
 import AnalyticsPageView from '../models/AnalyticsPageView.js';
@@ -55,6 +56,7 @@ export function createMongoStore(connection) {
           AdminLog,
           DeletionJob,
           AuthSession,
+          PasswordResetToken,
           AnalyticsVisitor,
           AnalyticsSession,
           AnalyticsPageView,
@@ -84,6 +86,7 @@ export function createMongoStore(connection) {
           AdminLog,
           DeletionJob,
           AuthSession,
+          PasswordResetToken,
           AnalyticsVisitor,
           AnalyticsSession,
           AnalyticsPageView,
@@ -183,6 +186,39 @@ export function createMongoStore(connection) {
       },
       async removeForUser(userId, tx) {
         await AuthSession.deleteMany({ userId }, options(tx));
+      },
+    },
+    passwordResetTokens: {
+      async replaceForUser(userId, values) {
+        try {
+          return plain(
+            await PasswordResetToken.findOneAndUpdate(
+              { userId },
+              { $set: values, $setOnInsert: { userId } },
+              { upsert: true, new: true, runValidators: true, setDefaultsOnInsert: true },
+            ).lean(),
+          );
+        } catch (error) {
+          if (error.code !== 11000) throw error;
+          return plain(
+            await PasswordResetToken.findOneAndUpdate(
+              { userId },
+              { $set: values },
+              { new: true, runValidators: true },
+            ).lean(),
+          );
+        }
+      },
+      async consume(tokenHash, now = new Date(), tx) {
+        return plain(
+          await PasswordResetToken.findOneAndDelete(
+            { tokenHash, expiresAt: { $gt: now } },
+            options(tx),
+          ).lean(),
+        );
+      },
+      async deleteForUser(userId, tx) {
+        await PasswordResetToken.deleteMany({ userId }, options(tx));
       },
     },
     requests: {

@@ -176,6 +176,32 @@ export async function sendWelcomeEmail(user) {
   });
 }
 
+export async function sendPasswordResetEmail({ user, resetUrl, expiresMinutes }) {
+  if (!user?.email || !resetUrl) return false;
+
+  const username = escapeHtml(String(user.username || 'there'));
+  const expiry = Number(expiresMinutes) || 20;
+  const expiryNote = `This secure link can be used once and expires in ${expiry} minutes. If you did not request a password reset, you can safely ignore this email; your password will not change.`;
+  const html = brandedEmail({
+    preview: 'Use this secure link to choose a new ErasePaper password.',
+    label: 'Password security',
+    title: 'Reset your password',
+    intro: `<p style="margin:0 0 12px;font-size:15px;line-height:24px;color:${BRAND.ink};">Hi ${username},</p><p style="margin:0;font-size:14px;line-height:23px;color:${BRAND.muted};">We received a request to reset the password for your ErasePaper account. Use the secure button below to choose a new password.</p>`,
+    content: `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:21px;border:1px solid ${BRAND.line};border-radius:12px;"><tr><td style="padding:15px 17px;"><div style="font-size:10px;line-height:15px;font-weight:700;letter-spacing:.8px;color:${BRAND.muted};text-transform:uppercase;">What to expect</div><div style="padding-top:8px;font-size:13px;line-height:21px;color:${BRAND.ink};">Create a new password to secure your account. Your existing sessions will be signed out after the password changes.</div></td></tr></table>`,
+    buttonUrl: resetUrl,
+    buttonLabel: 'Choose a new password',
+    note: expiryNote,
+    footerText: 'For your security, ErasePaper will never ask you to send your password by email.',
+  });
+
+  return sendEmail({
+    to: user.email,
+    subject: 'Reset your ErasePaper password',
+    text: `Hi ${user.username || 'there'},\n\nWe received a request to reset the password for your ErasePaper account. Use this secure link to choose a new password: ${resetUrl}\n\nThis link can be used once and expires in ${expiry} minutes. If you did not request a password reset, ignore this email; your password will not change.\n\nNeed help? Reply to this email or contact ${BRAND.support}.\n\nErasePaper · Simplifying Academic Life`,
+    html,
+  });
+}
+
 export async function sendRequestEmails({ user, requestId, serviceName }) {
   if (!user?.email || !requestId || !serviceName) return;
 

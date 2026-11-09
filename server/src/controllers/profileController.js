@@ -27,7 +27,15 @@ export function createProfileController(store) {
       }
       let user;
       try {
-        user = await store.users.update(req.user._id, values);
+        if (values.emailNormalized !== undefined) {
+          user = await store.withTransaction(async (tx) => {
+            const updated = await store.users.update(req.user._id, values, tx);
+            await store.passwordResetTokens.deleteForUser(req.user._id, tx);
+            return updated;
+          });
+        } else {
+          user = await store.users.update(req.user._id, values);
+        }
       } catch (error) {
         if (error.code === 11000)
           throw new AppError(409, 'That email is already registered.', 'EMAIL_CONFLICT');

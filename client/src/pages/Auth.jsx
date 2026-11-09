@@ -256,6 +256,16 @@ function AuthScreen({ intent = 'signin' }) {
                 minLength={signup ? 7 : 1}
                 maxLength={128}
               />
+              {!signup && (
+                <div className="mt-2 flex justify-end">
+                  <Link
+                    to="/forgot-password"
+                    className="auth-text-action text-xs font-semibold text-brand-600"
+                  >
+                    Forgot Password?
+                  </Link>
+                </div>
+              )}
             </div>
 
             {signup && (

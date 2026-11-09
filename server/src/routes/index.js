@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { Router } from 'express';
 import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
 import config from '../config/env.js';
@@ -46,6 +47,33 @@ export function createRoutes({ store, auth, deletion }) {
     legacyHeaders: false,
     message: { error: 'Too many sign-in attempts. Please try again later.' },
   });
+  const forgotPasswordIpLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 5,
+    standardHeaders: 'draft-8',
+    legacyHeaders: false,
+    message: { error: 'Too many password reset requests. Please wait and try again later.' },
+  });
+  const forgotPasswordEmailLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    limit: 3,
+    keyGenerator: (req) => {
+      const email = typeof req.body?.email === 'string' ? req.body.email.trim().toLowerCase() : '';
+      return email
+        ? `reset-email:${createHash('sha256').update(email).digest('hex')}`
+        : `reset-invalid:${ipKeyGenerator(req.ip)}`;
+    },
+    standardHeaders: 'draft-8',
+    legacyHeaders: false,
+    message: { error: 'Too many password reset requests. Please wait and try again later.' },
+  });
+  const resetPasswordLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 10,
+    standardHeaders: 'draft-8',
+    legacyHeaders: false,
+    message: { error: 'Too many password reset attempts. Please wait and try again later.' },
+  });
 
   router.get('/health', (req, res) =>
     res.json({ status: 'ok', mode: config.demo ? 'demo' : 'live', database: store.kind }),
@@ -55,6 +83,13 @@ export function createRoutes({ store, auth, deletion }) {
   );
   router.post('/auth/register', authLimiter, asyncHandler(account.register));
   router.post('/auth/login', authLimiter, asyncHandler(account.login));
+  router.post(
+    '/auth/forgot-password',
+    forgotPasswordIpLimiter,
+    forgotPasswordEmailLimiter,
+    asyncHandler(account.forgotPassword),
+  );
+  router.post('/auth/reset-password', resetPasswordLimiter, asyncHandler(account.resetPassword));
   router.post('/auth/logout', asyncHandler(account.logout));
   if (config.demo) router.post('/auth/demo/quick', asyncHandler(account.quickDemo));
 

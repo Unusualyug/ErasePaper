@@ -352,6 +352,10 @@ test('private attachment upload and ownership-protected download work', async ()
     .expect(400);
 });
 test('profile email changes enforce uniqueness and cannot clear an email used for sign-in', async () => {
+  await store.passwordResetTokens.replaceForUser(other._id, {
+    tokenHash: 'e'.repeat(64),
+    expiresAt: new Date(Date.now() + 20 * 60 * 1000),
+  });
   await request(app)
     .patch('/api/me')
     .set('Cookie', otherCookie)
@@ -359,6 +363,11 @@ test('profile email changes enforce uniqueness and cannot clear an email used fo
     .expect(200);
   assert.equal((await store.users.findById(other._id)).email, 'new.address@example.com');
   assert.equal((await store.users.findById(other._id)).emailNormalized, 'new.address@example.com');
+  assert.equal(
+    store.data.passwordResetTokens.some((token) => String(token.userId) === String(other._id)),
+    false,
+    'changing a sign-in email invalidates any existing reset link',
+  );
   await request(app)
     .patch('/api/me')
     .set('Cookie', otherCookie)
@@ -385,6 +394,10 @@ test('account deletion requires exact confirmation and protects admins', async (
 });
 test('secure deletion removes records, blocks old sessions, and keeps non-PII audit trail', async () => {
   const previousRequests = await store.requests.allForUser(other._id);
+  await store.passwordResetTokens.replaceForUser(other._id, {
+    tokenHash: 'f'.repeat(64),
+    expiresAt: new Date(Date.now() + 20 * 60 * 1000),
+  });
   const result = await request(app)
     .delete(`/api/admin/students/${other._id}`)
     .set('Cookie', adminCookie)
@@ -393,6 +406,11 @@ test('secure deletion removes records, blocks old sessions, and keeps non-PII au
   assert.equal(result.body.status, 'completed');
   assert.equal(await store.users.findById(other._id), null);
   assert.equal((await store.requests.allForUser(other._id)).length, 0);
+  assert.equal(
+    store.data.passwordResetTokens.some((token) => String(token.userId) === String(other._id)),
+    false,
+    'account deletion removes pending reset links',
+  );
   await request(app).get('/api/me').set('Cookie', otherCookie).expect(401);
   assert.equal(
     store.data.sessions.some((session) => String(session.userId) === String(other._id)),

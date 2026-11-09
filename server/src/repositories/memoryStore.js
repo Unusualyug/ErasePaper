@@ -21,6 +21,7 @@ export function createMemoryStore() {
   const data = {
     users: [],
     sessions: [],
+    passwordResetTokens: [],
     requests: [],
     services: SERVICES.map((s) => ({ ...clone(s), _id: s.slug, active: true })),
     logs: [],
@@ -154,6 +155,37 @@ export function createMemoryStore() {
       },
       async removeForUser(userId) {
         data.sessions = data.sessions.filter((session) => !matchesId(session.userId, userId));
+      },
+    },
+    passwordResetTokens: {
+      async replaceForUser(userId, values) {
+        const normalizedUserId = String(userId);
+        let token = data.passwordResetTokens.find((item) => String(item.userId) === normalizedUserId);
+        if (token) {
+          Object.assign(token, clone(values), { updatedAt: new Date() });
+        } else {
+          token = {
+            _id: newId(),
+            userId: normalizedUserId,
+            ...clone(values),
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          };
+          data.passwordResetTokens.push(token);
+        }
+        return clone(token);
+      },
+      async consume(tokenHash, now = new Date()) {
+        const index = data.passwordResetTokens.findIndex(
+          (token) => token.tokenHash === tokenHash && new Date(token.expiresAt) > now,
+        );
+        if (index === -1) return null;
+        return clone(data.passwordResetTokens.splice(index, 1)[0]);
+      },
+      async deleteForUser(userId) {
+        data.passwordResetTokens = data.passwordResetTokens.filter(
+          (token) => !matchesId(token.userId, userId),
+        );
       },
     },
     requests: {
