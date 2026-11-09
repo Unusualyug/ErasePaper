@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import CountUp from 'react-countup';
 import {
@@ -16,7 +16,7 @@ import {
 import { useApi } from '../../hooks/useApi';
 import { useAppAuth } from '../../context/AuthContext';
 import { useServices } from '../../context/ServicesContext';
-import { Avatar, Spinner, ErrorState } from '../../components/UI';
+import { Avatar, ErrorState } from '../../components/UI';
 import RequestDetails from '../../components/RequestDetails';
 import RequestTable from '../../components/RequestTable';
 import { formatDate, timeAgo } from '../../lib/constants';
@@ -39,6 +39,7 @@ export default function Overview() {
   const { data, loading, error, refresh } = useApi('/admin/overview');
   const [selected, setSelected] = useState(null),
     [retrying, setRetrying] = useState('');
+  const retryLock = useRef(false);
   const { user, mode } = useAppAuth();
   const services = useServices();
   const toast = useToast();
@@ -46,6 +47,8 @@ export default function Overview() {
   const max = Math.max(1, ...(stats?.months.map((m) => m.count) || [1]));
   const serviceMax = Math.max(1, ...(stats?.services.map((s) => s.count) || [1]));
   async function retry(id) {
+    if (retryLock.current) return;
+    retryLock.current = true;
     setRetrying(id);
     try {
       const { data } = await api.post(`/admin/deletions/${id}/retry`);
@@ -59,10 +62,50 @@ export default function Overview() {
     } catch (error) {
       toast(errorMessage(error), 'error');
     } finally {
+      retryLock.current = false;
       setRetrying('');
     }
   }
-  if (loading && !data) return <Spinner label="Preparing your admin overview…" className="min-h-[60vh]" />;
+  if (loading && !data)
+    return (
+      <div className="min-h-[60vh] space-y-6" role="status" aria-label="Loading administrator overview">
+        <span className="sr-only">Preparing your admin overview…</span>
+        <div className="flex items-end justify-between gap-4">
+          <div className="space-y-3">
+            <div className="skeleton-block h-3 w-32" />
+            <div className="skeleton-block h-8 w-64 max-w-[70vw]" />
+            <div className="skeleton-block h-3 w-80 max-w-[75vw]" />
+          </div>
+          <div className="skeleton-block hidden h-9 w-32 sm:block" />
+        </div>
+        <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
+          {Array.from({ length: 4 }, (_, index) => (
+            <div key={index} className="admin-card space-y-4 p-5">
+              <div className="skeleton-block h-3 w-28" />
+              <div className="skeleton-block h-9 w-20" />
+              <div className="skeleton-block h-3 w-36 max-w-full" />
+            </div>
+          ))}
+        </div>
+        <div className="grid gap-6 xl:grid-cols-[1.45fr_1fr]">
+          <div className="admin-card h-72 p-6">
+            <div className="skeleton-block mb-5 h-4 w-40" />
+            <div className="skeleton-block h-52 w-full" />
+          </div>
+          <div className="admin-card h-72 p-6">
+            <div className="skeleton-block mb-5 h-4 w-36" />
+            <div className="space-y-6">
+              {Array.from({ length: 4 }, (_, index) => (
+                <div key={index} className="space-y-2">
+                  <div className="skeleton-block h-3 w-full" />
+                  <div className="skeleton-block h-1.5 w-full" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   if (error) return <ErrorState message={error} onRetry={refresh} />;
   return (
     <>
@@ -110,7 +153,7 @@ export default function Overview() {
                 className="btn btn-sm border border-amber-500/30 text-amber-300"
               >
                 <RefreshCw size={13} className={retrying === job.id ? 'animate-spin' : ''} />
-                Retry cleanup
+                {retrying === job.id ? 'Retrying…' : 'Retry cleanup'}
               </button>
             </div>
           ))}

@@ -7,14 +7,47 @@ export function subscribeAuthExpired(listener) {
   return () => authExpiredListeners.delete(listener);
 }
 
+let activeRequests = 0;
+let activityStopTimer;
+function emitApiActivity(active) {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('erasepaper:api-activity', { detail: { active } }));
+  }
+}
+
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '/api',
   timeout: 25000,
   withCredentials: true,
 });
+function finishApiActivity() {
+  activeRequests = Math.max(0, activeRequests - 1);
+  if (activeRequests > 0) {
+    emitApiActivity(activeRequests);
+    return;
+  }
+  clearTimeout(activityStopTimer);
+  activityStopTimer = setTimeout(() => {
+    activityStopTimer = undefined;
+    emitApiActivity(0);
+  }, 100);
+}
+
+api.interceptors.request.use((config) => {
+  clearTimeout(activityStopTimer);
+  activityStopTimer = undefined;
+  activeRequests += 1;
+  emitApiActivity(activeRequests);
+  return config;
+});
+
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    finishApiActivity();
+    return response;
+  },
   (error) => {
+    finishApiActivity();
     const url = error.config?.url || '';
     if (error.response?.status === 401 && !/^\/?auth\/(login|register|demo\/quick)/.test(url)) {
       for (const listener of authExpiredListeners) listener(error);

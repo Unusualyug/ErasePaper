@@ -18,7 +18,7 @@ import { useAppAuth } from '../../context/AuthContext';
 import { useServices } from '../../context/ServicesContext';
 import { useApi } from '../../hooks/useApi';
 import { SERVICE_ICONS, SERVICE_COLORS, formatDate, whatsappUrl } from '../../lib/constants';
-import { PageHeading, Spinner, ErrorState, Avatar } from '../../components/UI';
+import { PageHeading, ErrorState, Avatar } from '../../components/UI';
 import RequestTable from '../../components/RequestTable';
 import RequestDetails from '../../components/RequestDetails';
 import { WhatsAppIcon } from '../../components/WhatsAppButton';
@@ -27,7 +27,7 @@ export default function Dashboard() {
   const services = useServices();
   const [selected, setSelected] = useState(null);
   const { data, loading, error, refresh: refreshRequests } = useApi('/requests?limit=5');
-  const { data: summary, refresh: refreshSummary } = useApi('/requests/summary');
+  const { data: summary, loading: summaryLoading, refresh: refreshSummary } = useApi('/requests/summary');
   const refresh = () => {
     refreshRequests();
     refreshSummary();
@@ -92,9 +92,15 @@ export default function Dashboard() {
           <div key={label} className="card flex items-center justify-between p-5">
             <div>
               <p className="text-[11px] font-medium text-slate-500">{label}</p>
-              <p className="mt-2 text-[30px] font-semibold tracking-tight">
-                {loading ? '—' : <CountUp end={number} duration={1.2} />}
-              </p>
+              {summaryLoading ? (
+                <div className="mt-2 flex h-9 items-center" role="status" aria-label={`Loading ${label}`}>
+                  <span className="skeleton-block h-8 w-16" aria-hidden="true" />
+                </div>
+              ) : (
+                <p className="mt-2 text-[30px] font-semibold tracking-tight">
+                  <CountUp end={number} duration={1.2} />
+                </p>
+              )}
             </div>
             <span className={`rounded-xl p-3 ${color}`}>
               <Icon size={21} strokeWidth={1.6} />
@@ -119,7 +125,19 @@ export default function Dashboard() {
               </Link>
             </div>
             {loading ? (
-              <Spinner label="Loading your requests…" />
+              <div className="space-y-1 px-5 pb-4" role="status" aria-label="Loading recent requests">
+                <span className="sr-only">Loading your requests…</span>
+                {Array.from({ length: 3 }, (_, index) => (
+                  <div key={index} className="flex items-center gap-3 border-t border-slate-100 py-4">
+                    <span className="skeleton-block h-9 w-9 shrink-0 rounded-lg" aria-hidden="true" />
+                    <span className="min-w-0 flex-1 space-y-2">
+                      <span className="skeleton-block block h-3 w-2/3" aria-hidden="true" />
+                      <span className="skeleton-block block h-2.5 w-1/3" aria-hidden="true" />
+                    </span>
+                    <span className="skeleton-block h-5 w-16 rounded-full" aria-hidden="true" />
+                  </div>
+                ))}
+              </div>
             ) : (
               <RequestTable requests={requests.slice(0, 5)} onSelect={setSelected} compact />
             )}

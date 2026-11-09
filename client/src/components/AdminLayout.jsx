@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
-import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import AnimatedOutlet from './AnimatedOutlet';
 import {
   LayoutDashboard,
   UsersRound,
@@ -14,6 +15,7 @@ import {
   ShieldCheck,
   LockKeyhole,
   Settings2,
+  LoaderCircle,
 } from 'lucide-react';
 import { Logo, Avatar } from './UI';
 import NotificationPanel from './NotificationPanel';
@@ -34,6 +36,8 @@ const nav = [
 
 export default function AdminLayout() {
   const [open, setOpen] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+  const signOutLock = useRef(false);
   const triggerRef = useRef(null);
   const drawerRef = useRef(null);
   const { user, logout, mode } = useAppAuth();
@@ -43,11 +47,17 @@ export default function AdminLayout() {
   useMobileDrawer(open, closeDrawer, drawerRef, triggerRef);
   const location = useLocation();
   async function signOut() {
+    if (signOutLock.current) return;
+    signOutLock.current = true;
+    setSigningOut(true);
     try {
       await logout({ redirectUrl: '/' });
       if (mode === 'demo') navigate('/', { replace: true });
     } catch {
       navigate('/sign-in', { replace: true });
+    } finally {
+      signOutLock.current = false;
+      setSigningOut(false);
     }
   }
   return (
@@ -114,9 +124,13 @@ export default function AdminLayout() {
             <ArrowUpRight size={17} />
             View website
           </Link>
-          <button onClick={signOut} className="nav-link w-full text-slate-400 hover:text-white">
-            <LogOut size={17} />
-            Sign out
+          <button
+            onClick={signOut}
+            disabled={signingOut}
+            className="nav-link w-full text-slate-400 hover:text-white"
+          >
+            {signingOut ? <LoaderCircle size={17} className="animate-spin" /> : <LogOut size={17} />}
+            {signingOut ? 'Signing out…' : 'Sign out'}
           </button>
           <div className="mt-4 flex items-center gap-2 border-t border-white/[.06] px-3 pt-5">
             <span
@@ -159,7 +173,7 @@ export default function AdminLayout() {
           </div>
         </header>
         <main className="mx-auto max-w-[1530px] p-5 pb-12 sm:p-8">
-          <Outlet />
+          <AnimatedOutlet />
         </main>
         <footer className="admin-footer border-t border-white/[.06] px-5 py-5 sm:px-8">
           <LegalLinks className="app-footer-legal" />

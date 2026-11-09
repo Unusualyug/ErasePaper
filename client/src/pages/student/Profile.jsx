@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   UserRound,
@@ -22,6 +22,8 @@ export default function Profile() {
   const [name, setName] = useState(user?.fullName || '');
   const [email, setEmail] = useState(user?.email || '');
   const [busy, setBusy] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+  const actionLock = useRef(false);
   const [error, setError] = useState('');
   const [section, setSection] = useState('details');
   const toast = useToast();
@@ -35,6 +37,8 @@ export default function Profile() {
   const dirty = name !== user?.fullName || email !== user?.email;
   async function save(event) {
     event.preventDefault();
+    if (actionLock.current) return;
+    actionLock.current = true;
     setBusy(true);
     setError('');
     try {
@@ -44,13 +48,24 @@ export default function Profile() {
     } catch (requestError) {
       setError(errorMessage(requestError));
     } finally {
+      actionLock.current = false;
       setBusy(false);
     }
   }
 
   async function signOut() {
-    await logout();
-    navigate('/');
+    if (actionLock.current) return;
+    actionLock.current = true;
+    setSigningOut(true);
+    try {
+      await logout();
+      navigate('/', { replace: true });
+    } catch {
+      navigate('/sign-in', { replace: true });
+    } finally {
+      actionLock.current = false;
+      setSigningOut(false);
+    }
   }
 
   return (
@@ -76,10 +91,11 @@ export default function Profile() {
           ))}
           <button
             onClick={signOut}
+            disabled={signingOut || busy}
             className="nav-link mt-2 w-full border-t border-slate-100 text-slate-500 hover:text-red-600"
           >
-            <LogOut size={16} />
-            Sign out
+            {signingOut ? <LoaderCircle size={16} className="animate-spin" /> : <LogOut size={16} />}
+            {signingOut ? 'Signing out…' : 'Sign out'}
           </button>
         </aside>
 
@@ -105,7 +121,7 @@ export default function Profile() {
           </section>
 
           {section === 'details' ? (
-            <form onSubmit={save} className="card">
+            <form onSubmit={save} className="card" aria-busy={busy}>
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 p-6">
                 <div>
                   <h2 className="text-base font-bold">Personal information</h2>
@@ -202,6 +218,7 @@ export default function Profile() {
                 <button
                   type="button"
                   className="btn-secondary w-full sm:w-auto"
+                  disabled={busy}
                   onClick={() => {
                     setName(user?.fullName || '');
                     setEmail(user?.email || '');

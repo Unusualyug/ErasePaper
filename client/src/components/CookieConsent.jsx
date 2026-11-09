@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Cookie, LockKeyhole, Settings2, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useCookieConsent } from '../context/CookieConsentContext';
 import { DEFAULT_COOKIE_PREFERENCES, normalizeCookiePreferences } from '../lib/preferences';
 import { Modal } from './UI';
@@ -86,8 +87,8 @@ export default function CookieConsentExperience() {
                 consent; no marketing trackers are used.
               </p>
               <div className="cookie-banner-links">
-                <a href="/privacy-policy">Privacy policy</a>
-                <a href="/cookie-policy">Cookie policy</a>
+                <Link to="/privacy-policy">Privacy policy</Link>
+                <Link to="/cookie-policy">Cookie policy</Link>
               </div>
             </div>
           </div>

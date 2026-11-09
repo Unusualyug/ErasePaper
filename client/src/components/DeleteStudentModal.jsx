@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AlertTriangle, LoaderCircle, Trash2 } from 'lucide-react';
 import { Modal, ErrorState, Avatar } from './UI';
 import api, { errorMessage } from '../lib/api';
@@ -7,6 +7,7 @@ export default function DeleteStudentModal({ student, onClose, onDeleted }) {
   const [confirmation, setConfirmation] = useState(''),
     [busy, setBusy] = useState(false),
     [error, setError] = useState('');
+  const submitLock = useRef(false);
   const toast = useToast();
   useEffect(() => {
     setConfirmation('');
@@ -14,6 +15,8 @@ export default function DeleteStudentModal({ student, onClose, onDeleted }) {
   }, [student?.id]);
   async function remove(e) {
     e.preventDefault();
+    if (submitLock.current) return;
+    submitLock.current = true;
     setBusy(true);
     setError('');
     try {
@@ -24,6 +27,7 @@ export default function DeleteStudentModal({ student, onClose, onDeleted }) {
     } catch (error) {
       setError(errorMessage(error));
     } finally {
+      submitLock.current = false;
       setBusy(false);
     }
   }
@@ -38,7 +42,7 @@ export default function DeleteStudentModal({ student, onClose, onDeleted }) {
       dark
     >
       {student && (
-        <form onSubmit={remove} className="space-y-5">
+        <form onSubmit={remove} className="space-y-5" aria-busy={busy}>
           <div className="flex items-center gap-3 rounded-lg border border-white/10 bg-white/5 p-4">
             <Avatar name={student.fullName} />
             <div>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Paperclip,
   Download,
@@ -20,6 +20,7 @@ export default function RequestDetails({ request, onClose, admin = false, onUpda
     [busy, setBusy] = useState(false),
     [error, setError] = useState(''),
     [cancelConfirm, setCancelConfirm] = useState(false);
+  const actionLock = useRef(false);
   const toast = useToast();
   useEffect(() => {
     setStatus(request?.status || 'Pending');
@@ -37,10 +38,13 @@ export default function RequestDetails({ request, onClose, admin = false, onUpda
     } catch (error) {
       setError(errorMessage(error));
     } finally {
+      actionLock.current = false;
       setBusy(false);
     }
   }
   async function cancel() {
+    if (actionLock.current) return;
+    actionLock.current = true;
     setBusy(true);
     try {
       const { data } = await api.post(`/requests/${request.id}/cancel`);
@@ -50,6 +54,7 @@ export default function RequestDetails({ request, onClose, admin = false, onUpda
     } catch (error) {
       setError(errorMessage(error));
     } finally {
+      actionLock.current = false;
       setBusy(false);
     }
   }
@@ -219,8 +224,8 @@ export default function RequestDetails({ request, onClose, admin = false, onUpda
                     className="btn-primary"
                     disabled={busy || (status === request.status && notes === (request.adminNotes || ''))}
                   >
-                    {busy ? <LoaderCircle size={16} className="animate-spin" /> : <Save size={16} />}Save
-                    changes
+                    {busy ? <LoaderCircle size={16} className="animate-spin" /> : <Save size={16} />}
+                    {busy ? 'Saving…' : 'Save changes'}
                   </button>
                 </div>
               </div>
@@ -270,8 +275,8 @@ export default function RequestDetails({ request, onClose, admin = false, onUpda
             Keep request
           </button>
           <button className="btn-danger" disabled={busy} onClick={cancel}>
-            <Ban size={15} />
-            Cancel request
+            {busy ? <LoaderCircle size={15} className="animate-spin" /> : <Ban size={15} />}
+            {busy ? 'Cancelling…' : 'Cancel request'}
           </button>
         </div>
       </Modal>

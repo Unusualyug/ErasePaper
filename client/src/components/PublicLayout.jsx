@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link, Outlet } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import AnimatedOutlet from './AnimatedOutlet';
 import { ArrowUpRight, Menu, X, ArrowRight, ShieldCheck, UserRound, LogIn } from 'lucide-react';
 import { Logo } from './UI';
 import WhatsAppButton, { WhatsAppIcon } from './WhatsAppButton';
@@ -51,13 +53,13 @@ export default function PublicLayout() {
           </Link>
           <nav aria-label="Main navigation" className="hidden items-center gap-7 lg:flex">
             {links.map(([label, href]) => (
-              <a
+              <Link
                 key={href}
-                href={href}
+                to={href}
                 className="text-[12px] font-medium text-navy-500 transition hover:text-brand-600"
               >
                 {label}
-              </a>
+              </Link>
             ))}
           </nav>
           <div className="hidden items-center gap-5 lg:flex">
@@ -99,56 +101,63 @@ export default function PublicLayout() {
             </button>
           </div>
         </div>
-        {menu && (
-          <nav
-            ref={menuRef}
-            id="public-mobile-navigation"
-            className="mobile-site-menu border-t border-slate-100 bg-white px-6 py-5 lg:hidden"
-            aria-label="Mobile navigation"
-          >
-            {links.map(([label, href]) => (
-              <a
-                key={href}
-                href={href}
-                onClick={() => setMenu(false)}
-                className="block py-3 text-sm font-medium"
-              >
-                {label}
-              </a>
-            ))}
-            <a
-              href={whatsappUrl()}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Contact ErasePaper on WhatsApp at +91 98257 51614"
-              className="public-menu-whatsapp mt-2 flex min-h-11 items-center justify-between gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 text-xs font-semibold text-emerald-800"
-              onClick={() => setMenu(false)}
+        <AnimatePresence>
+          {menu && (
+            <motion.nav
+              ref={menuRef}
+              key="public-mobile-navigation"
+              id="public-mobile-navigation"
+              className="mobile-site-menu border-t border-slate-100 bg-white px-6 py-5 lg:hidden"
+              aria-label="Mobile navigation"
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -3 }}
+              transition={{ duration: 0.14, ease: 'easeOut' }}
             >
-              <span className="flex items-center gap-2">
-                <WhatsAppIcon size={17} />
-                WhatsApp · +91 98257 51614
-              </span>
-              <ArrowUpRight size={15} />
-            </a>
-            <div className="mt-3 flex gap-3">
-              <Link
-                className="btn-secondary flex-1"
-                to={user ? (user.role === 'admin' ? '/admin' : '/dashboard') : '/sign-in'}
+              {links.map(([label, href]) => (
+                <Link
+                  key={href}
+                  to={href}
+                  onClick={() => setMenu(false)}
+                  className="block py-3 text-sm font-medium"
+                >
+                  {label}
+                </Link>
+              ))}
+              <a
+                href={whatsappUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Contact ErasePaper on WhatsApp at +91 98257 51614"
+                className="public-menu-whatsapp mt-2 flex min-h-11 items-center justify-between gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 text-xs font-semibold text-emerald-800"
                 onClick={() => setMenu(false)}
               >
-                {user ? 'Dashboard' : 'Sign in'}
-              </Link>
-              {!user && (
-                <Link className="btn-primary flex-1" to="/sign-up" onClick={() => setMenu(false)}>
-                  Get started
+                <span className="flex items-center gap-2">
+                  <WhatsAppIcon size={17} />
+                  WhatsApp · +91 98257 51614
+                </span>
+                <ArrowUpRight size={15} />
+              </a>
+              <div className="mt-3 flex gap-3">
+                <Link
+                  className="btn-secondary flex-1"
+                  to={user ? (user.role === 'admin' ? '/admin' : '/dashboard') : '/sign-in'}
+                  onClick={() => setMenu(false)}
+                >
+                  {user ? 'Dashboard' : 'Sign in'}
                 </Link>
-              )}
-            </div>
-          </nav>
-        )}
+                {!user && (
+                  <Link className="btn-primary flex-1" to="/sign-up" onClick={() => setMenu(false)}>
+                    Get started
+                  </Link>
+                )}
+              </div>
+            </motion.nav>
+          )}
+        </AnimatePresence>
       </header>
       <main id="main-content">
-        <Outlet />
+        <AnimatedOutlet />
       </main>
       <footer className="site-footer border-t border-slate-100 bg-[#f8f9fc]">
         <div className="container-site grid gap-10 pb-10 pt-14 md:grid-cols-[1.6fr_1fr_1fr_1.2fr]">
@@ -168,18 +177,18 @@ export default function PublicLayout() {
           <div>
             <h3 className="mb-4 text-xs font-bold">Explore</h3>
             <div className="flex flex-col gap-3 text-xs text-slate-500">
-              <a href="/#services" className="hover:text-brand-600">
+              <Link to="/#services" className="hover:text-brand-600">
                 Our services
-              </a>
-              <a href="/#how-it-works" className="hover:text-brand-600">
+              </Link>
+              <Link to="/#how-it-works" className="hover:text-brand-600">
                 How it works
-              </a>
-              <a href="/#why-us" className="hover:text-brand-600">
+              </Link>
+              <Link to="/#why-us" className="hover:text-brand-600">
                 Why ErasePaper
-              </a>
-              <a href="/#faqs" className="hover:text-brand-600">
+              </Link>
+              <Link to="/#faqs" className="hover:text-brand-600">
                 FAQs
-              </a>
+              </Link>
             </div>
           </div>
           <div>

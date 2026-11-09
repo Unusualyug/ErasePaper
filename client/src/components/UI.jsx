@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   X,
   LoaderCircle,
@@ -50,8 +50,11 @@ export function Spinner({ label = 'Loading…', className = '' }) {
 }
 export function ErrorState({ message, onRetry }) {
   return (
-    <div
+    <motion.div
       role="alert"
+      initial={{ opacity: 0, y: 4 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.14 }}
       className="error-state rounded-xl border border-red-100 bg-red-50 p-5 text-sm text-red-700"
     >
       <div className="flex items-start gap-2">
@@ -63,7 +66,7 @@ export function ErrorState({ message, onRetry }) {
           Try again
         </button>
       )}
-    </div>
+    </motion.div>
   );
 }
 export function EmptyState({ title = 'Nothing here yet', description, action, icon: Icon = Inbox }) {
@@ -176,47 +179,59 @@ export function Modal({ open, onClose, title, description, children, wide = fals
       previous?.focus?.();
     };
   }, [open]);
-  if (!open) return null;
   return createPortal(
-    <div
-      className={`fixed inset-0 z-[80] flex items-center justify-center overflow-y-auto bg-navy-950/55 p-4 backdrop-blur-[3px] ${dark ? 'text-slate-100' : 'text-navy-900'}`}
-      onMouseDown={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
-      <motion.div
-        ref={panel}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={id}
-        initial={{ opacity: 0, y: 12, scale: 0.98 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        className={`my-auto max-h-[90dvh] w-full overflow-y-auto rounded-2xl shadow-2xl ${wide ? 'max-w-2xl' : 'max-w-lg'} ${dark ? 'border border-white/10 bg-navy-800' : 'bg-white'}`}
-      >
-        <div
-          className={`sticky top-0 z-10 flex items-start justify-between gap-4 border-b p-6 ${dark ? 'border-white/10 bg-navy-800' : 'border-slate-100 bg-white'}`}
+    <AnimatePresence initial={false}>
+      {open && (
+        <motion.div
+          key="modal-backdrop"
+          className={`fixed inset-0 z-[80] flex items-center justify-center overflow-y-auto bg-navy-950/55 p-4 backdrop-blur-[3px] ${dark ? 'text-slate-100' : 'text-navy-900'}`}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.14 }}
+          onMouseDown={(e) => {
+            if (e.target === e.currentTarget) onClose();
+          }}
         >
-          <div>
-            <h2 id={id} className="text-xl font-bold">
-              {title}
-            </h2>
-            {description && (
-              <p className={`mt-1.5 text-sm leading-relaxed ${dark ? 'text-slate-400' : 'text-slate-500'}`}>
-                {description}
-              </p>
-            )}
-          </div>
-          <button
-            onClick={onClose}
-            aria-label="Close dialog"
-            className={`rounded-lg p-1.5 ${dark ? 'hover:bg-white/10' : 'hover:bg-slate-100'}`}
+          <motion.div
+            ref={panel}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={id}
+            initial={{ opacity: 0, y: 10, scale: 0.985 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 4, scale: 0.99 }}
+            transition={{ duration: 0.16, ease: 'easeOut' }}
+            className={`my-auto max-h-[90dvh] w-full overflow-y-auto rounded-2xl shadow-2xl ${wide ? 'max-w-2xl' : 'max-w-lg'} ${dark ? 'border border-white/10 bg-navy-800' : 'bg-white'}`}
           >
-            <X size={20} />
-          </button>
-        </div>
-        <div className="p-6">{children}</div>
-      </motion.div>
-    </div>,
+            <div
+              className={`sticky top-0 z-10 flex items-start justify-between gap-4 border-b p-6 ${dark ? 'border-white/10 bg-navy-800' : 'border-slate-100 bg-white'}`}
+            >
+              <div>
+                <h2 id={id} className="text-xl font-bold">
+                  {title}
+                </h2>
+                {description && (
+                  <p
+                    className={`mt-1.5 text-sm leading-relaxed ${dark ? 'text-slate-400' : 'text-slate-500'}`}
+                  >
+                    {description}
+                  </p>
+                )}
+              </div>
+              <button
+                onClick={onClose}
+                aria-label="Close dialog"
+                className={`rounded-lg p-1.5 ${dark ? 'hover:bg-white/10' : 'hover:bg-slate-100'}`}
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="p-6">{children}</div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>,
     document.body,
   );
 }

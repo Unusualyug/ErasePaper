@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { ArrowLeft, CheckCircle2, LoaderCircle, Mail, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import api, { errorMessage } from '../lib/api';
 
 export default function ForgotPassword() {
@@ -8,9 +9,12 @@ export default function ForgotPassword() {
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
+  const submitLock = useRef(false);
 
   async function submit(event) {
     event.preventDefault();
+    if (submitLock.current) return;
+    submitLock.current = true;
     setBusy(true);
     setError('');
     try {
@@ -19,6 +23,7 @@ export default function ForgotPassword() {
     } catch (requestError) {
       setError(errorMessage(requestError));
     } finally {
+      submitLock.current = false;
       setBusy(false);
     }
   }
@@ -37,7 +42,14 @@ export default function ForgotPassword() {
           </Link>
 
           {sent ? (
-            <div className="pt-8" role="status" aria-live="polite">
+            <motion.div
+              className="pt-8"
+              role="status"
+              aria-live="polite"
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.16 }}
+            >
               <span className="mb-5 inline-flex rounded-xl bg-emerald-50 p-3 text-emerald-600">
                 <CheckCircle2 size={24} />
               </span>
@@ -54,7 +66,7 @@ export default function ForgotPassword() {
               <Link to="/sign-in" className="btn-primary mt-6 w-full">
                 Return to sign in
               </Link>
-            </div>
+            </motion.div>
           ) : (
             <>
               <span className="mb-5 mt-8 inline-flex rounded-xl bg-brand-50 p-3 text-brand-600">
@@ -67,7 +79,7 @@ export default function ForgotPassword() {
                 secure link to choose a new password.
               </p>
 
-              <form onSubmit={submit} className="mt-7 space-y-4">
+              <form onSubmit={submit} className="mt-7 space-y-4" aria-busy={busy}>
                 <div>
                   <label htmlFor="recovery-email" className="label">
                     Email address

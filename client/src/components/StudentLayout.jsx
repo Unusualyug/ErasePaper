@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
-import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
+import AnimatedOutlet from './AnimatedOutlet';
 import {
   LayoutDashboard,
   Files,
@@ -13,6 +14,7 @@ import {
   LifeBuoy,
   ShieldCheck,
   BookOpenCheck,
+  LoaderCircle,
 } from 'lucide-react';
 import { Logo, Avatar } from './UI';
 import WhatsAppButton from './WhatsAppButton';
@@ -38,6 +40,8 @@ const quickNav = [
 
 export default function StudentLayout() {
   const [open, setOpen] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+  const signOutLock = useRef(false);
   const triggerRef = useRef(null);
   const drawerRef = useRef(null);
   const { user, logout, mode } = useAppAuth();
@@ -45,11 +49,17 @@ export default function StudentLayout() {
   const closeDrawer = () => setOpen(false);
   useMobileDrawer(open, closeDrawer, drawerRef, triggerRef);
   async function signOut() {
+    if (signOutLock.current) return;
+    signOutLock.current = true;
+    setSigningOut(true);
     try {
       await logout({ redirectUrl: '/' });
       if (mode === 'demo') navigate('/', { replace: true });
     } catch {
       navigate('/sign-in', { replace: true });
+    } finally {
+      signOutLock.current = false;
+      setSigningOut(false);
     }
   }
   return (
@@ -133,9 +143,13 @@ export default function StudentLayout() {
             <ArrowUpRight size={17} />
             Back to website
           </Link>
-          <button onClick={signOut} className="nav-link w-full text-slate-400 hover:text-white">
-            <LogOut size={17} />
-            Sign out
+          <button
+            onClick={signOut}
+            disabled={signingOut}
+            className="nav-link w-full text-slate-400 hover:text-white"
+          >
+            {signingOut ? <LoaderCircle size={17} className="animate-spin" /> : <LogOut size={17} />}
+            {signingOut ? 'Signing out…' : 'Sign out'}
           </button>
           {mode === 'demo' && (
             <p className="mt-3 px-3 text-[9px] text-slate-500">Demo workspace · Sample data only</p>
@@ -181,7 +195,7 @@ export default function StudentLayout() {
           id="student-content"
           className="mx-auto max-w-[1440px] px-4 py-5 pb-28 sm:p-8 sm:pb-32 lg:p-9 lg:pb-16"
         >
-          <Outlet />
+          <AnimatedOutlet />
         </main>
         <footer className="student-footer border-t border-slate-200/70 px-5 py-5 sm:px-8 lg:px-9">
           <LegalLinks className="app-footer-legal" />

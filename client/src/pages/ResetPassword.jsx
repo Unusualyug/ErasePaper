@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ArrowLeft,
   CheckCircle2,
@@ -10,6 +10,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useAppAuth } from '../context/AuthContext';
 import api, { errorMessage } from '../lib/api';
 
@@ -35,6 +36,7 @@ export default function ResetPassword() {
   const [success, setSuccess] = useState(false);
   const [invalidLink, setInvalidLink] = useState(!token);
   const [error, setError] = useState('');
+  const submitLock = useRef(false);
   const strength = passwordStrength(newPassword);
   const passwordsMatch = confirmPassword.length > 0 && newPassword === confirmPassword;
 
@@ -67,6 +69,8 @@ export default function ResetPassword() {
       return;
     }
 
+    if (submitLock.current) return;
+    submitLock.current = true;
     setBusy(true);
     try {
       await api.post('/auth/reset-password', { token, newPassword, confirmPassword });
@@ -79,6 +83,7 @@ export default function ResetPassword() {
         setError(errorMessage(requestError));
       }
     } finally {
+      submitLock.current = false;
       setBusy(false);
     }
   }
@@ -89,7 +94,14 @@ export default function ResetPassword() {
         <div className="h-1.5 bg-brand-600" />
         <div className="p-6 sm:p-9">
           {success ? (
-            <div className="py-8 text-center" role="status" aria-live="polite">
+            <motion.div
+              className="py-8 text-center"
+              role="status"
+              aria-live="polite"
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.16 }}
+            >
               <span className="mx-auto mb-5 inline-flex rounded-full bg-emerald-50 p-3 text-emerald-600">
                 <CheckCircle2 size={27} />
               </span>
@@ -101,9 +113,14 @@ export default function ResetPassword() {
               <Link to="/sign-in" className="btn-primary mt-6 w-full">
                 Sign in now
               </Link>
-            </div>
+            </motion.div>
           ) : invalidLink ? (
-            <div className="py-8">
+            <motion.div
+              className="py-8"
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.16 }}
+            >
               <span className="mb-5 inline-flex rounded-xl bg-amber-50 p-3 text-amber-600">
                 <KeyRound size={24} />
               </span>
@@ -123,7 +140,7 @@ export default function ResetPassword() {
                 <ArrowLeft size={14} />
                 Back to sign in
               </Link>
-            </div>
+            </motion.div>
           ) : (
             <>
               <Link
@@ -142,7 +159,7 @@ export default function ResetPassword() {
                 Create a strong password you haven’t used for another account.
               </p>
 
-              <form onSubmit={submit} className="mt-7 space-y-5">
+              <form onSubmit={submit} className="mt-7 space-y-5" aria-busy={busy}>
                 <div>
                   <label htmlFor="new-password" className="label">
                     New password

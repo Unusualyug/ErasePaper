@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { lazy, useEffect, useRef, useState } from 'react';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import {
@@ -9,6 +9,7 @@ import {
   Link,
   useLocation,
   useNavigate,
+  useNavigationType,
   useSearchParams,
 } from 'react-router-dom';
 import { MotionConfig } from 'framer-motion';
@@ -19,6 +20,7 @@ import '@fontsource/inter/700.css';
 import './index.css';
 import './styles/analytics.css';
 import api from './lib/api';
+import { getScrollPlan } from './lib/navigation';
 import { safeReturnPath } from './lib/preferences';
 import { CookieConsentProvider } from './context/CookieConsentContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -31,6 +33,8 @@ import PublicLayout from './components/PublicLayout';
 import StudentLayout from './components/StudentLayout';
 import AdminLayout from './components/AdminLayout';
 import AnalyticsTracker from './components/AnalyticsTracker';
+import ApiProgress from './components/ApiProgress';
+import { RouteFade } from './components/AnimatedOutlet';
 import PaperCurlIntro from './components/PaperCurlIntro';
 const Home = lazy(() => import('./pages/Home'));
 const Auth = lazy(() => import('./pages/Auth'));
@@ -58,10 +62,94 @@ const TermsAndConditions = lazy(() =>
 );
 
 function RouteEffects() {
-  const { pathname } = useLocation();
+  const location = useLocation();
+  const navigationType = useNavigationType();
+  const positions = useRef(new Map());
+  const previousLocation = useRef(null);
+  const scrollJob = useRef({ raf: 0, timer: 0 });
+
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
+    const previousRestoration = window.history.scrollRestoration;
+    window.history.scrollRestoration = 'manual';
+    return () => {
+      window.history.scrollRestoration = previousRestoration;
+    };
+  }, []);
+
+  useEffect(() => {
+    const savePosition = () => {
+      positions.current.set(location.key, { top: window.scrollY, left: window.scrollX });
+    };
+    window.addEventListener('scroll', savePosition, { passive: true });
+    return () => window.removeEventListener('scroll', savePosition);
+  }, [location.key]);
+
+  useEffect(() => {
+    const previous = previousLocation.current;
+    const plan = getScrollPlan({
+      previousPath: previous?.pathname ?? location.pathname,
+      nextPath: location.pathname,
+      navigationType,
+      savedPosition: positions.current.get(location.key),
+      currentPosition: window.scrollY,
+      hash: location.hash,
+    });
+    previousLocation.current = location;
+
+    window.cancelAnimationFrame(scrollJob.current.raf);
+    window.clearTimeout(scrollJob.current.timer);
+    let attempts = 0;
+    const applyScroll = () => {
+      if (plan.type === 'hash') {
+        let id = plan.hash.slice(1);
+        try {
+          id = decodeURIComponent(id);
+        } catch {}
+        const target = document.getElementById(id);
+        if (target) {
+          target.scrollIntoView({ block: 'start', behavior: 'auto' });
+          return;
+        }
+        if (attempts < 24) {
+          attempts += 1;
+          scrollJob.current.timer = window.setTimeout(applyScroll, 75);
+        }
+        return;
+      }
+
+      const top = Math.max(0, plan.top || 0);
+      const root = document.documentElement;
+      const previousBehavior = root.style.scrollBehavior;
+      root.style.scrollBehavior = 'auto';
+      window.scrollTo(plan.left || 0, top);
+      root.style.scrollBehavior = previousBehavior;
+
+      const maxTop = Math.max(0, root.scrollHeight - window.innerHeight);
+      if (navigationType === 'POP' && top > maxTop + 2 && attempts < 32) {
+        attempts += 1;
+        scrollJob.current.timer = window.setTimeout(applyScroll, 75);
+      }
+    };
+    const scheduleScroll = () => {
+      window.cancelAnimationFrame(scrollJob.current.raf);
+      window.clearTimeout(scrollJob.current.timer);
+      scrollJob.current.raf = window.requestAnimationFrame(() => {
+        scrollJob.current.raf = window.requestAnimationFrame(applyScroll);
+      });
+    };
+    const onRouteReady = (event) => {
+      if (event.detail?.locationKey === location.key) scheduleScroll();
+    };
+    window.addEventListener('erasepaper:route-ready', onRouteReady);
+    // Standalone routes and failed lazy imports still get a deterministic scroll plan.
+    scrollJob.current.timer = window.setTimeout(scheduleScroll, 1800);
+
+    return () => {
+      window.removeEventListener('erasepaper:route-ready', onRouteReady);
+      window.cancelAnimationFrame(scrollJob.current.raf);
+      window.clearTimeout(scrollJob.current.timer);
+    };
+  }, [location, navigationType]);
   return null;
 }
 
@@ -244,70 +332,71 @@ function AppRoutes() {
     <>
       <AnalyticsTracker />
       <RouteEffects />
-      <Suspense
-        fallback={
-          <div className="flex min-h-[60vh] items-center justify-center px-4">
-            <Spinner label="Loading your page…" />
-          </div>
-        }
-      >
-        <Routes>
-          <Route element={<PublicLayout />}>
-            <Route index element={<HomeReady onReady={setHomeReady} />} />
-            <Route path="privacy-policy" element={<PrivacyPolicy />} />
-            <Route path="cookie-policy" element={<CookiePolicy />} />
-            <Route path="terms-and-conditions" element={<TermsAndConditions />} />
-            <Route path="forgot-password" element={<ForgotPassword />} />
-            <Route path="reset-password" element={<ResetPassword />} />
-            <Route
-              path="sign-in"
-              element={
-                <Guest>
-                  <Auth intent="signin" />
-                </Guest>
-              }
-            />
-            <Route
-              path="sign-up"
-              element={
-                <Guest>
-                  <Auth intent="signup" />
-                </Guest>
-              }
-            />
-          </Route>
-          <Route path="auth/complete" element={<AuthComplete />} />
+      <Routes>
+        <Route element={<PublicLayout />}>
+          <Route index element={<HomeReady onReady={setHomeReady} />} />
+          <Route path="privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="cookie-policy" element={<CookiePolicy />} />
+          <Route path="terms-and-conditions" element={<TermsAndConditions />} />
+          <Route path="forgot-password" element={<ForgotPassword />} />
+          <Route path="reset-password" element={<ResetPassword />} />
           <Route
+            path="sign-in"
             element={
-              <Protected>
-                <StudentLayout />
-              </Protected>
+              <Guest>
+                <Auth intent="signin" />
+              </Guest>
             }
-          >
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="requests" element={<Requests />} />
-            <Route path="requests/new" element={<NewRequest />} />
-            <Route path="profile" element={<Profile />} />
-          </Route>
+          />
           <Route
-            path="admin"
+            path="sign-up"
             element={
-              <Protected admin>
-                <AdminLayout />
-              </Protected>
+              <Guest>
+                <Auth intent="signup" />
+              </Guest>
             }
-          >
-            <Route index element={<AdminOverview />} />
-            <Route path="students" element={<Students />} />
-            <Route path="students/:id" element={<StudentDetail />} />
-            <Route path="requests" element={<AdminRequests />} />
-            <Route path="activity" element={<AdminActivity />} />
-            <Route path="analytics" element={<AdminAnalytics />} />
-            <Route path="settings" element={<AdminSettings />} />
-          </Route>
-          <Route
-            path="*"
-            element={
+          />
+        </Route>
+        <Route
+          path="auth/complete"
+          element={
+            <RouteFade>
+              <AuthComplete />
+            </RouteFade>
+          }
+        />
+        <Route
+          element={
+            <Protected>
+              <StudentLayout />
+            </Protected>
+          }
+        >
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="requests" element={<Requests />} />
+          <Route path="requests/new" element={<NewRequest />} />
+          <Route path="profile" element={<Profile />} />
+        </Route>
+        <Route
+          path="admin"
+          element={
+            <Protected admin>
+              <AdminLayout />
+            </Protected>
+          }
+        >
+          <Route index element={<AdminOverview />} />
+          <Route path="students" element={<Students />} />
+          <Route path="students/:id" element={<StudentDetail />} />
+          <Route path="requests" element={<AdminRequests />} />
+          <Route path="activity" element={<AdminActivity />} />
+          <Route path="analytics" element={<AdminAnalytics />} />
+          <Route path="settings" element={<AdminSettings />} />
+        </Route>
+        <Route
+          path="*"
+          element={
+            <RouteFade>
               <div className="flex min-h-screen flex-col items-center justify-center p-6 text-center">
                 <Link to="/">
                   <Logo />
@@ -319,10 +408,10 @@ function AppRoutes() {
                   Back to home
                 </Link>
               </div>
-            }
-          />
-        </Routes>
-      </Suspense>
+            </RouteFade>
+          }
+        />
+      </Routes>
       <PaperCurlIntro contentReady={homeReady} />
     </>
   );
@@ -330,13 +419,10 @@ function AppRoutes() {
 
 function ModeApplication({ mode }) {
   const app = (
-    <MotionConfig reducedMotion="user">
-      <ServicesProvider>
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
-      </ServicesProvider>
-    </MotionConfig>
+    <ServicesProvider>
+      <ApiProgress />
+      <AppRoutes />
+    </ServicesProvider>
   );
   return <LocalAuthProvider mode={mode}>{app}</LocalAuthProvider>;
 }
@@ -385,9 +471,13 @@ function Root() {
   return (
     <CookieConsentProvider>
       <ThemeProvider>
-        <ToastProvider>
-          <ClientRoot />
-        </ToastProvider>
+        <MotionConfig reducedMotion="user">
+          <ToastProvider>
+            <BrowserRouter>
+              <ClientRoot />
+            </BrowserRouter>
+          </ToastProvider>
+        </MotionConfig>
       </ThemeProvider>
     </CookieConsentProvider>
   );

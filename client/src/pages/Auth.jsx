@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -35,6 +35,7 @@ function AuthScreen({ intent = 'signin' }) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const submitLock = useRef(false);
   const navigate = useNavigate();
   const location = useLocation();
   const [params] = useSearchParams();
@@ -66,6 +67,8 @@ function AuthScreen({ intent = 'signin' }) {
       setError('Enter a valid mobile number. Include a country code if you are outside India.');
       return;
     }
+    if (submitLock.current) return;
+    submitLock.current = true;
     setBusy(true);
     try {
       const endpoint = signup ? '/auth/register' : '/auth/login';
@@ -78,11 +81,14 @@ function AuthScreen({ intent = 'signin' }) {
     } catch (requestError) {
       setError(errorMessage(requestError));
     } finally {
+      submitLock.current = false;
       setBusy(false);
     }
   }
 
   async function quick(persona) {
+    if (submitLock.current) return;
+    submitLock.current = true;
     setBusy(true);
     setError('');
     try {
@@ -92,6 +98,7 @@ function AuthScreen({ intent = 'signin' }) {
     } catch (requestError) {
       setError(errorMessage(requestError));
     } finally {
+      submitLock.current = false;
       setBusy(false);
     }
   }
@@ -167,7 +174,7 @@ function AuthScreen({ intent = 'signin' }) {
             </div>
           )}
 
-          <form onSubmit={submit} className="space-y-4">
+          <form onSubmit={submit} className="space-y-4" aria-busy={busy}>
             <div>
               <label htmlFor="email" className="label">
                 Email address

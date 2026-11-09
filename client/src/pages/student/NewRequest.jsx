@@ -29,6 +29,8 @@ export default function NewRequest() {
     [busy, setBusy] = useState(false),
     [drag, setDrag] = useState(false);
   const fileInput = useRef(null);
+  const submitLock = useRef(false);
+  const [uploadProgress, setUploadProgress] = useState(null);
   const toast = useToast();
   const navigate = useNavigate();
   function changeService(value) {
@@ -60,8 +62,11 @@ export default function NewRequest() {
   }
   async function submit(e) {
     e.preventDefault();
+    if (submitLock.current) return;
+    submitLock.current = true;
     setError('');
     setBusy(true);
+    setUploadProgress(null);
     const form = new FormData(e.currentTarget);
     const payload = {
       serviceSlug: slug,
@@ -82,13 +87,21 @@ export default function NewRequest() {
     );
     files.forEach((file) => data.append('attachments', file));
     try {
-      const response = await api.post('/requests', data);
+      const response = await api.post('/requests', data, {
+        onUploadProgress: (event) => {
+          if (event.total && files.length) {
+            setUploadProgress(Math.min(100, Math.round((event.loaded / event.total) * 100)));
+          }
+        },
+      });
       toast('Request submitted. We’ll be in touch with your next steps.');
       navigate(`/requests?request=${response.data.request.id}`);
     } catch (error) {
       setError(errorMessage(error));
     } finally {
+      submitLock.current = false;
       setBusy(false);
+      setUploadProgress(null);
     }
   }
   return (
@@ -119,6 +132,7 @@ export default function NewRequest() {
                     key={s.slug}
                     type="button"
                     onClick={() => changeService(s.slug)}
+                    disabled={busy}
                     aria-pressed={slug === s.slug}
                     className={`flex min-h-12 items-center gap-2 rounded-lg border p-3 text-left text-xs font-medium transition ${slug === s.slug ? 'border-brand-400 bg-brand-50 text-brand-700 ring-1 ring-brand-400' : 'border-slate-200 text-slate-500 hover:border-brand-200'}`}
                   >
@@ -130,7 +144,7 @@ export default function NewRequest() {
               })}
             </div>
           </div>
-          <form onSubmit={submit} className="space-y-5 p-6" key={slug}>
+          <form onSubmit={submit} className="space-y-5 p-6" key={slug} aria-busy={busy}>
             <h2 className="text-sm font-bold">
               <span className="mr-2 text-brand-600">02</span>Share your requirements
             </h2>
@@ -150,6 +164,7 @@ export default function NewRequest() {
                 required
                 minLength={5}
                 maxLength={160}
+                disabled={busy}
               />
             </div>
             <div className="grid gap-5 sm:grid-cols-2">
@@ -163,6 +178,7 @@ export default function NewRequest() {
                     <select
                       id={field.key}
                       className="input"
+                      disabled={busy}
                       required={field.required}
                       value={details[field.key] || ''}
                       onChange={(e) => setDetails((d) => ({ ...d, [field.key]: e.target.value }))}
@@ -176,6 +192,7 @@ export default function NewRequest() {
                     <textarea
                       id={field.key}
                       className="input min-h-24"
+                      disabled={busy}
                       required={field.required}
                       value={details[field.key] || ''}
                       maxLength={1500}
@@ -186,6 +203,7 @@ export default function NewRequest() {
                     <input
                       id={field.key}
                       className="input"
+                      disabled={busy}
                       type={field.type}
                       required={field.required}
                       min={
@@ -216,6 +234,7 @@ export default function NewRequest() {
                 required
                 minLength={20}
                 maxLength={6000}
+                disabled={busy}
               />
               <p className="hint">
                 At least 20 characters. Please don’t include passwords or sensitive personal information.
@@ -230,6 +249,7 @@ export default function NewRequest() {
                 name="additionalInfo"
                 className="input min-h-20"
                 maxLength={3000}
+                disabled={busy}
                 placeholder="Preferred contact time, additional context, or specific questions"
               />
             </div>
@@ -239,6 +259,7 @@ export default function NewRequest() {
               </label>
               <button
                 type="button"
+                disabled={busy}
                 onClick={() => fileInput.current?.click()}
                 onDragOver={(e) => {
                   e.preventDefault();
@@ -267,6 +288,7 @@ export default function NewRequest() {
                 tabIndex={-1}
                 accept=".pdf,.doc,.docx,.png,.jpg,.txt"
                 multiple
+                disabled={busy}
                 onChange={(e) => {
                   addFiles(e.target.files);
                   e.target.value = '';
@@ -287,6 +309,7 @@ export default function NewRequest() {
                       </span>
                       <button
                         type="button"
+                        disabled={busy}
                         onClick={() => setFiles((f) => f.filter((_, index) => index !== i))}
                         aria-label={`Remove ${file.name}`}
                         className="p-1 text-slate-400 hover:text-red-500"
@@ -303,6 +326,7 @@ export default function NewRequest() {
                 type="checkbox"
                 name="integrity"
                 required
+                disabled={busy}
                 className="mt-1 h-4 w-4 shrink-0 accent-brand-600"
               />
               <span className="text-[11px] leading-6 text-navy-700">
@@ -311,6 +335,37 @@ export default function NewRequest() {
                 preparation and printing.
               </span>
             </label>
+            {busy && files.length > 0 && (
+              <div
+                className="space-y-2 rounded-lg border border-brand-100 bg-brand-50/70 p-3"
+                role="status"
+                aria-live="polite"
+              >
+                <div className="flex items-center justify-between gap-3 text-[11px] font-medium text-brand-700">
+                  <span>Uploading attachments</span>
+                  <span>{uploadProgress === null ? 'In progress…' : `${uploadProgress}%`}</span>
+                </div>
+                <div
+                  className="relative h-1.5 overflow-hidden rounded-full bg-brand-100"
+                  role="progressbar"
+                  aria-label="Request upload progress"
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={uploadProgress ?? undefined}
+                  aria-valuetext={uploadProgress === null ? 'Upload in progress' : `${uploadProgress}%`}
+                >
+                  <span
+                    className={
+                      uploadProgress === null
+                        ? 'upload-progress-indeterminate'
+                        : 'block h-full rounded-full bg-brand-600 transition-[width] duration-200'
+                    }
+                    style={uploadProgress === null ? undefined : { width: `${uploadProgress}%` }}
+                    aria-hidden="true"
+                  />
+                </div>
+              </div>
+            )}
             {error && <ErrorState message={error} />}
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-5">
               <span className="flex items-center gap-1.5 text-[10px] text-slate-400">
