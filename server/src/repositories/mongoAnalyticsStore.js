@@ -145,8 +145,7 @@ export function createMongoAnalyticsStore() {
       return { firstSeenAt: visitor.firstSeenAt };
     },
 
-    async pageView(input) {
-      if (await isRevoked(input.visitorKey)) return false;
+    async aggregatePageView(input) {
       const filter = { dayKey: input.dayKey, pageKey: input.pageKey };
       const update = {
         $inc: { pageViews: 1 },
@@ -161,11 +160,6 @@ export function createMongoAnalyticsStore() {
           $inc: { pageViews: 1 },
           $set: { retentionAt: input.retentionAt },
         });
-      }
-      if (await isRevoked(input.visitorKey)) {
-        await AnalyticsPageView.updateOne(filter, { $inc: { pageViews: -1 } });
-        await AnalyticsPageView.deleteOne({ ...filter, pageViews: { $lte: 0 } });
-        return false;
       }
       return true;
     },

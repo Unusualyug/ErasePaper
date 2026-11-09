@@ -150,7 +150,7 @@ function TrendChart({ data, metric }) {
           className="analytics-trend-svg"
           viewBox={`0 0 ${width} ${height}`}
           role="img"
-          aria-label={`${metric === 'visitors' ? 'Unique visitors' : 'Page views'} trend`}
+          aria-label={`${metric === 'visitors' ? 'Consented unique visitors' : 'Page views from all visitors'} trend`}
         >
           <defs>
             <linearGradient id="analytics-line-fill" x1="0" x2="0" y1="0" y2="1">
@@ -198,10 +198,15 @@ function TrendChart({ data, metric }) {
           <div className="mb-3 rounded-xl bg-brand-500/10 p-3 text-brand-300">
             <Eye size={22} />
           </div>
-          <p className="text-sm font-medium">No activity recorded in this period</p>
+          <p className="text-sm font-medium">
+            {metric === 'visitors'
+              ? 'No consented visitors recorded in this period'
+              : 'No page views recorded in this period'}
+          </p>
           <p className="mt-1 max-w-sm text-xs leading-5 text-slate-500">
-            This chart will reflect real, consented visits as they are collected. No sample traffic is
-            included.
+            {metric === 'visitors'
+              ? 'Unique visitor trends include only people who enable Analytics.'
+              : 'Page-view totals include all visits and are stored only as daily page-category counts.'}
           </p>
         </div>
       )}
@@ -217,8 +222,10 @@ function NewReturningBars({ data }) {
     return (
       <div className="flex min-h-[165px] flex-col items-center justify-center text-center">
         <UsersRound size={23} className="text-slate-500" />
-        <p className="mt-3 text-sm font-medium">No new or returning visitors yet</p>
-        <p className="mt-1 text-xs text-slate-500">Counts update after consented page views are received.</p>
+        <p className="mt-3 text-sm font-medium">No new or returning consented visitors yet</p>
+        <p className="mt-1 text-xs text-slate-500">
+          New and returning visitor counts require Analytics consent.
+        </p>
       </div>
     );
   return (
@@ -319,9 +326,9 @@ function PopularPages({ pages }) {
     <section className="admin-card min-w-0 p-5 sm:p-6">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h2 className="text-sm font-semibold">Popular pages & services</h2>
+          <h2 className="text-sm font-semibold">Popular pages & services · all visits</h2>
           <p className="mt-1 text-[11px] leading-5 text-slate-500">
-            Daily page totals only — not linked to visitor or session records.
+            Daily page-category totals from all visits, not linked to visitor or session records.
           </p>
         </div>
         <Layers3 size={18} className="shrink-0 text-brand-300" />
@@ -352,7 +359,7 @@ function PopularPages({ pages }) {
         <div className="mt-5 rounded-lg border border-dashed border-white/10 px-4 py-8 text-center">
           <Eye size={21} className="mx-auto text-slate-500" />
           <p className="mt-3 text-xs text-slate-500">
-            Popular pages appear after real, consented page views are recorded.
+            Popular pages appear after page views from any visitor are counted.
           </p>
         </div>
       )}
@@ -373,7 +380,7 @@ export default function AdminAnalytics() {
   const [error, setError] = useState('');
   const [filterError, setFilterError] = useState('');
   const [bucket, setBucket] = useState('daily');
-  const [metric, setMetric] = useState('visitors');
+  const [metric, setMetric] = useState('pageViews');
   const [clock, setClock] = useState(Date.now());
 
   const params = useMemo(() => {
@@ -438,16 +445,15 @@ export default function AdminAnalytics() {
     ? relativeTime(live.lastUpdatedAt, clock)
     : 'Waiting for the first update';
 
-  if (loading && !data)
-    return <Spinner label="Loading consented website analytics…" className="min-h-[55vh]" />;
+  if (loading && !data) return <Spinner label="Loading website analytics…" className="min-h-[55vh]" />;
   if (error && !data) return <ErrorState message={error} onRetry={() => loadReport(false)} />;
 
   return (
     <>
       <PageHeading
-        eyebrow="First-party · consent-based"
+        eyebrow="First-party · privacy-minimized"
         title="Website analytics"
-        description="Live presence and aggregate traffic from real page-view events. Visitor-level browsing histories are not exposed."
+        description="Page-view totals include all visits. Unique visitors, sessions and live presence include only people who opt into Analytics; individual browsing histories are never exposed."
         action={
           <button
             type="button"
@@ -575,28 +581,28 @@ export default function AdminAnalytics() {
       <div className="mb-6 grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         <MetricCard
           icon={UsersRound}
-          label="Unique visitors"
+          label="Unique visitors (consented)"
           value={summary.uniqueVisitors}
-          description="Consented pseudonymous visitors in this period."
+          description="Distinct pseudonymous visitors who enabled Analytics in this period."
           tone="brand"
         />
         <MetricCard
           icon={Layers3}
-          label="Sessions"
+          label="Sessions (consented)"
           value={summary.totalSessions}
-          description="Distinct consented browser sessions observed during the period."
+          description="Distinct browser sessions with Analytics consent during this period."
           tone="blue"
         />
         <MetricCard
           icon={Eye}
-          label="Page views"
+          label="Page views (all visitors)"
           value={summary.pageViews}
-          description="Daily page totals are stored without visitor or session links."
+          description="All counted page loads, including opt-outs. Repeat visits count again; this is not a unique-person total."
           tone="teal"
         />
         <MetricCard
           icon={Activity}
-          label="New visitors"
+          label="New visitors (consented)"
           value={summary.newVisitors}
           description={`${numberFormat.format(summary.returningVisitors || 0)} returning visitors in this period.`}
           tone="amber"
@@ -626,8 +632,8 @@ export default function AdminAnalytics() {
             </div>
             <div className="analytics-toggle-group" role="group" aria-label="Trend metric">
               {[
-                ['visitors', 'Visitors'],
-                ['pageViews', 'Page views'],
+                ['visitors', 'Consented visitors'],
+                ['pageViews', 'All page views'],
               ].map(([value, label]) => (
                 <button
                   key={value}
@@ -648,9 +654,10 @@ export default function AdminAnalytics() {
         <section className="admin-card min-w-0 p-5 sm:p-6">
           <div className="mb-2 flex items-start justify-between gap-3">
             <div>
-              <h2 className="text-sm font-semibold">New vs returning visitors</h2>
+              <h2 className="text-sm font-semibold">New vs returning consented visitors</h2>
               <p className="mt-1 text-[11px] leading-5 text-slate-500">
-                Visitor classification is based on first-seen time, not an exposed browsing history.
+                Classification is based on first-seen time, not an exposed browsing history. People who
+                decline optional Analytics appear only in page totals.
               </p>
             </div>
             <UsersRound size={18} className="shrink-0 text-brand-300" />
@@ -671,14 +678,14 @@ export default function AdminAnalytics() {
         <div className="grid min-w-0 gap-4 md:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
           <DistributionList
             title="Devices"
-            subtitle="Coarse category inferred from the request header; raw user-agent strings are not stored."
+            subtitle="Consented sessions only. Coarse device categories are inferred without retaining raw user-agent strings."
             icon={Smartphone}
             items={data?.devices || []}
             kind="device"
           />
           <DistributionList
             title="Traffic sources"
-            subtitle="Direct, search, social and referral categories; referrer URLs are not retained."
+            subtitle="Consented sessions only. Direct, search, social and referral categories; referrer URLs are not retained."
             icon={Globe2}
             items={data?.sources || []}
             kind="source"
@@ -696,7 +703,8 @@ export default function AdminAnalytics() {
             <div>
               <h2 className="text-sm font-semibold">Privacy & collection status</h2>
               <p className="mt-1 text-[11px] leading-5 text-slate-500">
-                The tracker runs only after a visitor grants Analytics consent.
+                Anonymous page totals include every visit; detailed visitor analytics requires Analytics
+                consent.
               </p>
             </div>
           </div>
@@ -704,13 +712,16 @@ export default function AdminAnalytics() {
             <li className="flex gap-2">
               <span className="text-emerald-400">•</span>
               <span>
-                Random visitor/session IDs are hashed server-side; no raw IP address, full URL query, or full
-                referrer is stored.
+                For every page view, only its date, normalized page category and count are stored; these
+                totals contain no browser ID, cookie, raw IP address or user-agent string.
               </span>
             </li>
             <li className="flex gap-2">
               <span className="text-emerald-400">•</span>
-              <span>Admins can view aggregates only, never an individual visitor's page sequence.</span>
+              <span>
+                With Analytics consent, random visitor/session IDs are hashed server-side for unique/session
+                counts. Admins see aggregates only, never an individual's page sequence.
+              </span>
             </li>
             <li className="flex gap-2">
               <span className="text-emerald-400">•</span>
@@ -729,8 +740,9 @@ export default function AdminAnalytics() {
           </ul>
           {mode === 'demo' && (
             <p className="mt-4 rounded-lg border border-brand-400/15 bg-brand-500/[.05] p-3 text-[10px] leading-5 text-slate-500">
-              Demo mode does not seed analytics figures. Any values shown come only from consented visits to
-              this running workspace.
+              Demo mode does not seed analytics figures. Page totals include visits to this workspace whether
+              or not the visitor accepts optional Analytics; unique visitors, sessions and live presence are
+              consent-based.
             </p>
           )}
         </section>

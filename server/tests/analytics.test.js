@@ -63,7 +63,7 @@ test('analytics ranges use Asia/Kolkata boundaries and constrain custom periods'
   });
 });
 
-test('analytics collection is consent-gated and reports are admin-only aggregate data', async () => {
+test('all visits get anonymous page totals while visitor analytics requires consent and reports are admin-only', async () => {
   await request(app).get('/api/admin/analytics?range=today').expect(401);
   await request(app).get('/api/admin/analytics?range=today').set('Cookie', studentCookie).expect(403);
 
@@ -73,6 +73,17 @@ test('analytics collection is consent-gated and reports are admin-only aggregate
     .expect(400);
   assert.equal(store.data.analyticsVisitors.length, 0);
   assert.equal(store.data.analyticsPageViews.length, 0);
+  await request(app).post('/api/analytics/aggregate-page-view').send({ path: '/', visitorId }).expect(400);
+
+  await request(app)
+    .post('/api/analytics/aggregate-page-view')
+    .send({ path: '/requests/private-id-should-not-be-stored?token=not-retained', hash: '' })
+    .expect(204);
+  await request(app)
+    .post('/api/analytics/aggregate-page-view')
+    .send({ path: '/sign-up', serviceSlug: 'research-paper' })
+    .expect(204);
+  assert.equal(store.data.analyticsVisitors.length, 0, 'anonymous page totals do not create visitor IDs');
 
   await request(app)
     .post('/api/analytics/page-view')
@@ -150,9 +161,18 @@ test('analytics collection is consent-gated and reports are admin-only aggregate
   // Stored page counts are unlinkable daily aggregates; visitor/activity/session records carry no page path.
   assert.equal(store.data.analyticsPageViews.length, 2);
   assert.equal(
-    store.data.analyticsPageViews.some((item) => 'visitorKey' in item || 'sessionKey' in item),
+    store.data.analyticsPageViews.some(
+      (item) =>
+        'visitorKey' in item ||
+        'sessionKey' in item ||
+        'path' in item ||
+        'referrer' in item ||
+        'userAgent' in item,
+    ),
     false,
   );
+  assert.equal(JSON.stringify(store.data.analyticsPageViews).includes('private-id'), false);
+  assert.equal(JSON.stringify(store.data.analyticsPageViews).includes('not-retained'), false);
   assert.equal(
     store.data.analyticsSessions.some((item) => 'currentPage' in item || 'entryPage' in item),
     false,
@@ -164,9 +184,10 @@ test('analytics collection is consent-gated and reports are admin-only aggregate
   assert.ok(store.data.analyticsVisitors[0].visitorKey !== visitorId);
 });
 
-test('withdrawal deletes linked identifiers and blocks later collection while retaining only unlinkable page totals', async () => {
+test('withdrawal deletes linked identifiers while anonymous page totals continue without visitor IDs', async () => {
   const id = '89913811-7071-420f-86ed-f8dc9c918736';
   const tab = '3ec79531-5f90-4355-927c-68a6b35ad872';
+  await request(app).post('/api/analytics/aggregate-page-view').send({ path: '/privacy-policy' }).expect(204);
   await request(app)
     .post('/api/analytics/page-view')
     .send(consentedPayload({ visitorId: id, sessionId: tab, path: '/privacy-policy' }))
@@ -206,6 +227,12 @@ test('withdrawal deletes linked identifiers and blocks later collection while re
   assert.equal(
     store.data.analyticsPageViews.reduce((sum, item) => sum + item.pageViews, 0),
     before,
+  );
+  await request(app).post('/api/analytics/aggregate-page-view').send({ path: '/privacy-policy' }).expect(204);
+  assert.equal(
+    store.data.analyticsPageViews.reduce((sum, item) => sum + item.pageViews, 0),
+    before + 1,
+    'aggregate page totals continue without recreating a visitor identifier',
   );
 });
 

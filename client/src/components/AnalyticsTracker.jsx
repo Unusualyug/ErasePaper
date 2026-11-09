@@ -25,6 +25,7 @@ export default function AnalyticsTracker() {
   const analyticsEnabled = consent?.preferences?.analytics === true;
   const identityRef = useRef(null);
   const lastRouteRef = useRef('');
+  const lastAggregateRouteRef = useRef('');
   const latestPageRef = useRef(null);
   const lastActivityRef = useRef(0);
   const lastHeartbeatRef = useRef(0);
@@ -36,6 +37,21 @@ export default function AnalyticsTracker() {
     serviceSlug: serviceSlugFromSearch(location.search),
     source: classifyTrafficSource(document.referrer, window.location.hostname),
   };
+
+  useEffect(() => {
+    if (lastAggregateRouteRef.current === routeKey) return;
+    lastAggregateRouteRef.current = routeKey;
+    const page = latestPageRef.current;
+    void api
+      .post('/analytics/aggregate-page-view', {
+        path: page.path,
+        hash: page.hash,
+        ...(page.serviceSlug ? { serviceSlug: page.serviceSlug } : {}),
+      })
+      .catch(() => {
+        // Anonymous daily page totals are optional to site operation and never interrupt usage.
+      });
+  }, [routeKey]);
 
   function noteActivity() {
     const now = Date.now();

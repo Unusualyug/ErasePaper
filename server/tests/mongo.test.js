@@ -295,7 +295,7 @@ test('dashboard and student summary use database aggregation', async () => {
   assert.equal(search.total, 1);
 });
 
-test('MongoDB analytics stores only daily page totals and returns aggregate reports', async () => {
+test('MongoDB analytics stores anonymous all-visit page totals and returns consented aggregate reports', async () => {
   const now = new Date();
   const dayKey = dateKeyInIndia(now);
   const retentionAt = new Date(now.getTime() + 400 * 24 * 60 * 60 * 1000);
@@ -316,8 +316,8 @@ test('MongoDB analytics stores only daily page totals and returns aggregate repo
   };
 
   await store.analytics.heartbeat({ ...base, visitorKey: visitorOne, sessionKey: sessionOne });
-  await store.analytics.pageView({ visitorKey: visitorOne, pageKey: 'home', dayKey, retentionAt });
-  await store.analytics.pageView({ visitorKey: visitorOne, pageKey: 'home', dayKey, retentionAt });
+  await store.analytics.aggregatePageView({ pageKey: 'home', dayKey, retentionAt });
+  await store.analytics.aggregatePageView({ pageKey: 'home', dayKey, retentionAt });
   await store.analytics.heartbeat({
     ...base,
     visitorKey: visitorTwo,
@@ -370,8 +370,7 @@ test('MongoDB analytics stores only daily page totals and returns aggregate repo
   assert.equal(afterWithdrawal.summary.pageViews, 2);
   const denied = await store.analytics.heartbeat({ ...base, visitorKey: visitorOne, sessionKey: sessionOne });
   assert.equal(denied.denied, true);
-  assert.equal(
-    await store.analytics.pageView({ visitorKey: visitorOne, pageKey: 'home', dayKey, retentionAt }),
-    false,
-  );
+  await store.analytics.aggregatePageView({ pageKey: 'home', dayKey, retentionAt });
+  const afterAnonymousView = await store.analytics.report(getAnalyticsRange('today'));
+  assert.equal(afterAnonymousView.summary.pageViews, 3);
 });

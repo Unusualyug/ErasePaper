@@ -94,20 +94,22 @@ export function PrivacyPolicy() {
         <p>
           If you choose to contact us through WhatsApp, that conversation is handled by WhatsApp under its own
           terms and privacy policy. ErasePaper does not use advertising pixels or third-party marketing
-          trackers. First-party website analytics is optional and is collected only after you enable Analytics
-          consent; it is stored separately from student profiles and service requests. Payment processing is
-          not currently integrated.
+          trackers. For basic traffic measurement, page views from all visitors—including people who decline
+          optional Analytics—are counted as daily, normalized page-category totals with no browser identifier.
+          This total cannot identify unique people. Optional detailed analytics is collected only after you
+          enable Analytics consent and is stored separately from student profiles and service requests.
+          Payment processing is not currently integrated.
         </p>
         <p>
-          Consented analytics may record random pseudonymous visitor/session identifiers, first/last-seen
-          timestamps, daily active dates, daily page-category totals, coarse device and traffic-source
+          After Analytics consent, detailed analytics may record random pseudonymous visitor/session
+          identifiers, first/last-seen timestamps, daily active dates, coarse device and traffic-source
           categories, and whether a session is anonymous, student or administrator. Identifiers are hashed on
           the server. Raw IP addresses, full user-agent strings, full referrer URLs, query strings and account
-          identifiers are not retained in analytics records. Page totals are stored without a visitor/session
-          link; administrators receive aggregate reports, not individual visitor browsing histories. Linked
-          analytics records expire after up to 400 days. Withdrawing consent requests deletion of linked
-          visitor, daily-activity and session records. Unlinkable daily page-view totals remain only as
-          aggregate counts.
+          identifiers are not retained in analytics records. Daily page totals are stored separately as a
+          date, normalized page category and count, without a visitor/session link; administrators receive
+          aggregate reports, not individual visitor browsing histories. Aggregate and linked analytics records
+          expire after up to 400 days. Withdrawing consent requests deletion of linked visitor, daily-activity
+          and session records; unlinkable daily page totals remain as aggregate counts.
         </p>
       </Section>
       <Section title="Access, correction and deletion requests">
@@ -129,10 +131,11 @@ export function PrivacyPolicy() {
           ErasePaper uses a seven-day HTTP-only authentication cookie with SameSite=Lax; production cookies
           are marked Secure and are not readable by page scripts. The site also stores your cookie-consent
           choice in this browser. A theme preference is saved locally only when Functional preferences are
-          enabled. After Analytics consent only, this site stores a random visitor identifier in localStorage
-          and a tab-scoped analytics session identifier in sessionStorage. They are used for pseudonymous
-          aggregate reporting, are not authentication credentials and are cleared when consent is withdrawn.
-          Demo accounts are isolated, in-memory sample accounts and reset when the server restarts.
+          enabled. Basic daily page totals use no cookie, localStorage value or visitor identifier. After
+          Analytics consent only, this site stores a random visitor identifier in localStorage and a
+          tab-scoped analytics session identifier in sessionStorage. They are used for pseudonymous visitor
+          counts, are not authentication credentials and are cleared when consent is withdrawn. Demo accounts
+          are isolated, in-memory sample accounts and reset when the server restarts.
         </p>
         <p>
           See the <Link to="/cookie-policy">Cookie policy</Link> for details. Authentication credentials are
@@ -192,13 +195,16 @@ export function CookiePolicy() {
       </Section>
       <Section title="Analytics and marketing">
         <p>
-          Optional first-party analytics is off by default and starts only after you enable the Analytics
-          category. It uses random visitor and tab-session identifiers, which are hashed by the server, to
-          count consented visits, sessions and page views and to group traffic by page category, coarse
-          device, traffic-source category and anonymous/student/admin role. A new tab session starts after 30
-          minutes without activity. Raw IP addresses, full user-agent strings, referrer URLs, query strings
-          and individual visitor journeys are not stored or shown to administrators. Analytics data is kept
-          separately from account and service-request records for up to 400 days.
+          ErasePaper counts page views from all visitors, including people who turn off optional Analytics.
+          This basic total stores only the date, a normalized page category and a count; it uses no browser
+          identifier or analytics cookie and cannot identify unique people. Optional detailed analytics is off
+          by default and starts only after you enable the Analytics category. It uses random visitor and
+          tab-session identifiers, which are hashed by the server, to count consented unique visitors and
+          sessions and to group opted-in traffic by coarse device, traffic-source category and
+          anonymous/student/admin role. A new tab session starts after 30 minutes without activity. Raw IP
+          addresses, full user-agent strings, referrer URLs, query strings and individual visitor journeys are
+          not stored or shown to administrators. Analytics records are kept separately from account and
+          service-request records for up to 400 days.
         </p>
         <p>
           When Analytics consent is withdrawn, tracking stops and ErasePaper requests deletion of records

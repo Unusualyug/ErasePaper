@@ -130,8 +130,7 @@ export function createMemoryAnalyticsStore(data) {
       return { firstSeenAt: new Date(visitor.firstSeenAt) };
     },
 
-    async pageView(input) {
-      if (data.analyticsRevocations.some((item) => item.visitorKey === input.visitorKey)) return false;
+    async aggregatePageView(input) {
       let bucket = data.analyticsPageViews.find(
         (item) => item.pageKey === input.pageKey && item.dayKey === input.dayKey,
       );
@@ -146,10 +145,6 @@ export function createMemoryAnalyticsStore(data) {
       }
       bucket.pageViews += 1;
       bucket.retentionAt = input.retentionAt;
-      if (data.analyticsRevocations.some((item) => item.visitorKey === input.visitorKey)) {
-        bucket.pageViews = Math.max(0, bucket.pageViews - 1);
-        return false;
-      }
       return true;
     },
 

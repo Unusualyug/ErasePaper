@@ -106,6 +106,7 @@ export function createRoutes({ store, auth, deletion }) {
     auth.optionalAuthenticate,
     asyncHandler(analytics.pageView),
   );
+  router.post('/analytics/aggregate-page-view', analyticsLimiter, asyncHandler(analytics.aggregatePageView));
   router.delete('/analytics/visitor', analyticsLimiter, asyncHandler(analytics.removeVisitor));
 
   router.use(auth.authenticate);

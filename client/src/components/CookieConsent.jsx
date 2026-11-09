@@ -21,8 +21,8 @@ const categories = [
   {
     key: 'analytics',
     title: 'Analytics',
-    copy: 'Optional first-party analytics counts consented visits, page views and coarse device/source categories. It does not use advertising pixels or retain raw referrer URLs.',
-    active: 'Only active after Analytics consent',
+    copy: 'Optional first-party analytics counts consented unique visitors, sessions and coarse device/source categories. Anonymous daily page totals include all visits and use no browser identifier. No advertising pixels or raw referrer URLs are used.',
+    active: 'Visitor/session details only after consent; anonymous page totals always counted',
   },
   {
     key: 'marketing',
@@ -82,9 +82,9 @@ export default function CookieConsentExperience() {
             <div>
               <h2>Privacy choices</h2>
               <p>
-                We use necessary storage to keep ErasePaper working and remember your choice. Optional
-                preferences are off until you enable them. First-party analytics runs only after Analytics
-                consent; no marketing trackers are used.
+                We use necessary storage to keep ErasePaper working and remember your choice. We also count
+                anonymous daily page totals for overall traffic, without browser identifiers. Optional visitor
+                and session analytics runs only after Analytics consent; no marketing trackers are used.
               </p>
               <div className="cookie-banner-links">
                 <Link to="/privacy-policy">Privacy policy</Link>

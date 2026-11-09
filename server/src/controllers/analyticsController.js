@@ -21,6 +21,13 @@ const collectionSchema = z
   })
   .strict();
 const pageViewSchema = collectionSchema;
+const aggregatePageViewSchema = z
+  .object({
+    path: z.string().startsWith('/').max(300),
+    hash: z.string().max(100).default(''),
+    serviceSlug: z.enum(serviceSlugs).optional(),
+  })
+  .strict();
 const visitorRemovalSchema = z.object({ visitorId: z.string().uuid() }).strict();
 const dateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 const reportQuerySchema = z
@@ -45,6 +52,11 @@ export function createAnalyticsController(store) {
     pageView: async (req, res) => {
       const input = pageViewSchema.parse(req.body);
       await analytics.pageView(input, req.user, req.get('user-agent'));
+      res.status(204).end();
+    },
+    aggregatePageView: async (req, res) => {
+      const input = aggregatePageViewSchema.parse(req.body);
+      await analytics.aggregatePageView(input);
       res.status(204).end();
     },
     removeVisitor: async (req, res) => {

@@ -220,29 +220,18 @@ export function createAnalyticsService(store) {
   }
 
   async function pageView(input, user, userAgent) {
-    const ids = identifiers(input);
+    const result = await heartbeat(input, user, userAgent);
+    return { recorded: !result.denied };
+  }
+
+  async function aggregatePageView(input) {
     const page = normalizePage(input);
     const now = new Date();
-    const dayKey = dateKeyInIndia(now);
-    const visitor = await store.analytics.heartbeat({
-      ...ids,
-      userType: classify(user),
-      device: classifyDevice(userAgent),
-      source: normalizeAnalyticsSource(input.source),
+    return store.analytics.aggregatePageView({
       pageKey: page.key,
-      dayKey,
-      now,
-      expiresAt: new Date(now.getTime() + PRESENCE_TTL_MS),
+      dayKey: dateKeyInIndia(now),
       retentionAt: new Date(now.getTime() + ANALYTICS_RETENTION_MS),
     });
-    if (visitor.denied) return { recorded: false };
-    const recorded = await store.analytics.pageView({
-      visitorKey: ids.visitorKey,
-      pageKey: page.key,
-      dayKey,
-      retentionAt: new Date(now.getTime() + ANALYTICS_RETENTION_MS),
-    });
-    return { recorded };
   }
 
   function removeVisitor(visitorId) {
@@ -302,7 +291,7 @@ export function createAnalyticsService(store) {
     };
   }
 
-  return { heartbeat, pageView, removeVisitor, report };
+  return { heartbeat, pageView, aggregatePageView, removeVisitor, report };
 }
 
 function classifyDevice(userAgent = '') {

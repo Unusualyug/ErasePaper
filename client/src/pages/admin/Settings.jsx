@@ -51,12 +51,14 @@ export default function AdminSettings() {
           </span>
           <h2 className="mt-4 text-base font-semibold">Cookie preferences</h2>
           <p className="mt-2 text-sm leading-6 text-slate-500">
-            Required storage is always on. Optional preferences can be changed or withdrawn at any time.
-            First-party analytics runs only after consent; no marketing trackers are used.
+            Required storage is always on. Anonymous daily page totals include all visits and use no browser
+            identifier. Optional visitor/session analytics can be changed or withdrawn at any time; no
+            marketing trackers are used.
           </p>
           <div className="settings-summary mt-5 flex flex-wrap gap-x-4 gap-y-2 rounded-lg p-3 text-xs">
             <span>Functional: {consent?.preferences?.functional ? 'On' : 'Off'}</span>
-            <span>Analytics: {consent?.preferences?.analytics ? 'On — first-party' : 'Off'}</span>
+            <span>Visitor analytics: {consent?.preferences?.analytics ? 'On — first-party' : 'Off'}</span>
+            <span>Anonymous page totals: On</span>
             <span>Marketing: {consent?.preferences?.marketing ? 'Consented, no integration' : 'Off'}</span>
           </div>
           <button className="btn-secondary mt-4" onClick={openSettings}>
