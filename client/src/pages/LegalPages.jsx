@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ExternalLink, ShieldCheck } from 'lucide-react';
 import { useCookieConsent } from '../context/CookieConsentContext';
+import { formatPhoneNumber, phoneUrl, SUPPORT_EMAIL, whatsappUrl } from '../lib/constants';
 
 function LegalPage({ title, eyebrow, intro, children }) {
   return (
@@ -18,8 +19,15 @@ function LegalPage({ title, eyebrow, intro, children }) {
         <ShieldCheck className="mb-3 text-brand-600" size={21} />
         <h2 className="text-base font-semibold">Questions about your information?</h2>
         <p className="mt-2 text-sm leading-6">
-          Contact ErasePaper on WhatsApp at <a href="https://wa.me/919825751614">+91 98257 51614</a>. Please
-          do not include your password in a message.
+          Email{' '}
+          <a href={`mailto:${SUPPORT_EMAIL}`} className="font-semibold underline underline-offset-2">
+            {SUPPORT_EMAIL}
+          </a>
+          , call <a href={phoneUrl()}>{formatPhoneNumber()}</a>, or{' '}
+          <a href={whatsappUrl()} target="_blank" rel="noopener noreferrer">
+            message us on WhatsApp
+          </a>
+          . Please do not include your password in a message.
         </p>
       </div>
     </div>
@@ -105,9 +113,9 @@ export function PrivacyPolicy() {
       <Section title="Access, correction and deletion requests">
         <p>
           You can review your profile and requests in the student portal. To request access, correction or
-          account deletion, contact ErasePaper at the WhatsApp number above and identify the account you are
-          asking about. An administrator can correct account information and run the secure account-deletion
-          process.
+          account deletion, contact ErasePaper by email or WhatsApp using the support details above and
+          identify the account you are asking about. An administrator can correct account information and run
+          the secure account-deletion process.
         </p>
         <p>
           Application deletion removes the profile, related requests, notifications, sign-in sessions and
@@ -273,9 +281,14 @@ export function TermsAndConditions() {
       </Section>
       <Section title="Contact">
         <p>
-          Questions about these terms can be sent to ErasePaper on WhatsApp at +91 98257 51614. The operator
-          should add its legal business details and any governing-law or dispute-resolution terms required for
-          its jurisdiction before production launch.
+          Questions about these terms can be emailed to{' '}
+          <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>, sent by{' '}
+          <a href={whatsappUrl()} target="_blank" rel="noopener noreferrer">
+            WhatsApp
+          </a>
+          , or discussed by phone at <a href={phoneUrl()}>{formatPhoneNumber()}</a>. The operator should add
+          its legal business details and any governing-law or dispute-resolution terms required for its
+          jurisdiction before production launch.
         </p>
       </Section>
     </LegalPage>

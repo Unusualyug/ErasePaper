@@ -12,7 +12,7 @@ import {
 import { Modal, StatusBadge, ErrorState, Avatar } from './UI';
 import { WhatsAppIcon } from './WhatsAppButton';
 import { useToast } from '../context/ToastContext';
-import { FIELD_LABELS, formatDate, whatsappUrl } from '../lib/constants';
+import { FIELD_LABELS, formatDate, SUPPORT_EMAIL, whatsappUrl } from '../lib/constants';
 import api, { errorMessage, downloadAttachment } from '../lib/api';
 export default function RequestDetails({ request, onClose, admin = false, onUpdated }) {
   const [status, setStatus] = useState(request?.status || 'Pending'),
@@ -233,8 +233,11 @@ export default function RequestDetails({ request, onClose, admin = false, onUpda
               <>
                 <div className="flex items-start gap-2 rounded-lg bg-brand-50 p-3 text-[11px] leading-5 text-brand-700">
                   <MessageCircle size={16} className="mt-0.5 shrink-0" />
-                  Need to add something? Contact us on WhatsApp and mention{' '}
-                  <strong>{request.requestId}</strong>.
+                  Need to add something? Contact us on WhatsApp or email{' '}
+                  <a href={`mailto:${SUPPORT_EMAIL}`} className="font-semibold underline underline-offset-2">
+                    {SUPPORT_EMAIL}
+                  </a>{' '}
+                  and mention <strong>{request.requestId}</strong>.
                 </div>
                 {error && <ErrorState message={error} />}
                 <div className="flex flex-wrap items-center justify-between gap-3">

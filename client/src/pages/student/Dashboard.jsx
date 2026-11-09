@@ -13,11 +13,21 @@ import {
   ShieldCheck,
   UserRound,
   CalendarDays,
+  Mail,
+  Phone,
 } from 'lucide-react';
 import { useAppAuth } from '../../context/AuthContext';
 import { useServices } from '../../context/ServicesContext';
 import { useApi } from '../../hooks/useApi';
-import { SERVICE_ICONS, SERVICE_COLORS, formatDate, whatsappUrl } from '../../lib/constants';
+import {
+  SERVICE_ICONS,
+  SERVICE_COLORS,
+  formatDate,
+  formatPhoneNumber,
+  phoneUrl,
+  SUPPORT_EMAIL,
+  whatsappUrl,
+} from '../../lib/constants';
 import { PageHeading, ErrorState, Avatar } from '../../components/UI';
 import RequestTable from '../../components/RequestTable';
 import RequestDetails from '../../components/RequestDetails';
@@ -210,6 +220,22 @@ export default function Dashboard() {
               Contact administrator
               <ArrowUpRight size={13} />
             </a>
+            <div className="mt-4 space-y-2 border-t border-brand-100 pt-3 text-[10px] font-medium">
+              <a
+                href={`mailto:${SUPPORT_EMAIL}`}
+                className="flex min-h-8 items-center gap-2 break-all text-slate-600 hover:text-brand-700"
+              >
+                <Mail size={13} className="shrink-0 text-brand-600" />
+                {SUPPORT_EMAIL}
+              </a>
+              <a
+                href={phoneUrl()}
+                className="flex min-h-8 items-center gap-2 text-slate-600 hover:text-brand-700"
+              >
+                <Phone size={13} className="shrink-0 text-brand-600" />
+                {formatPhoneNumber()}
+              </a>
+            </div>
           </section>
           <p className="flex items-start gap-2 px-2 text-[10px] leading-5 text-slate-400">
             <ShieldCheck size={14} className="mt-0.5 shrink-0" />

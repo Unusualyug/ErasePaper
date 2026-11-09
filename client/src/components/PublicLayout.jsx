@@ -2,11 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import AnimatedOutlet from './AnimatedOutlet';
-import { ArrowUpRight, Menu, X, ArrowRight, ShieldCheck, UserRound, LogIn } from 'lucide-react';
+import { ArrowUpRight, Menu, X, ArrowRight, ShieldCheck, UserRound, LogIn, Mail, Phone } from 'lucide-react';
 import { Logo } from './UI';
 import WhatsAppButton, { WhatsAppIcon } from './WhatsAppButton';
 import { useAppAuth } from '../context/AuthContext';
-import { whatsappUrl } from '../lib/constants';
+import { formatPhoneNumber, phoneUrl, SUPPORT_EMAIL, whatsappUrl } from '../lib/constants';
 import ThemeControl from './ThemeControl';
 import LegalLinks from './LegalLinks';
 
@@ -128,13 +128,13 @@ export default function PublicLayout() {
                 href={whatsappUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Contact ErasePaper on WhatsApp at +91 98257 51614"
+                aria-label={`Contact ErasePaper on WhatsApp at ${formatPhoneNumber()}`}
                 className="public-menu-whatsapp mt-2 flex min-h-11 items-center justify-between gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 text-xs font-semibold text-emerald-800"
                 onClick={() => setMenu(false)}
               >
                 <span className="flex items-center gap-2">
                   <WhatsAppIcon size={17} />
-                  WhatsApp · +91 98257 51614
+                  WhatsApp · {formatPhoneNumber()}
                 </span>
                 <ArrowUpRight size={15} />
               </a>
@@ -209,22 +209,33 @@ export default function PublicLayout() {
             </div>
           </div>
           <div>
-            <h3 className="mb-4 text-xs font-bold">Let’s connect</h3>
+            <h3 className="mb-4 text-xs font-bold">Contact &amp; support</h3>
             <p className="text-xs leading-6 text-slate-500">
-              Big question or small doubt?
-              <br />
-              We’re just a message away.
+              Big question or small doubt? We’re here to help.
             </p>
-            <a
-              href={whatsappUrl()}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-4 inline-flex items-center gap-2 text-xs font-semibold text-navy-800 hover:text-brand-600"
-            >
-              <WhatsAppIcon size={17} className="text-emerald-600" />
-              +91 98257 51614
-              <ArrowUpRight size={13} />
-            </a>
+            <div className="mt-4 flex flex-col gap-3 text-xs font-semibold text-navy-800">
+              <a
+                href={`mailto:${SUPPORT_EMAIL}`}
+                className="inline-flex min-h-8 items-center gap-2 break-all hover:text-brand-600"
+              >
+                <Mail size={15} className="shrink-0 text-brand-600" />
+                {SUPPORT_EMAIL}
+              </a>
+              <a href={phoneUrl()} className="inline-flex min-h-8 items-center gap-2 hover:text-brand-600">
+                <Phone size={15} className="shrink-0 text-brand-600" />
+                {formatPhoneNumber()}
+              </a>
+              <a
+                href={whatsappUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-8 items-center gap-2 hover:text-brand-600"
+              >
+                <WhatsAppIcon size={17} className="shrink-0 text-emerald-600" />
+                Message us on WhatsApp
+                <ArrowUpRight size={13} />
+              </a>
+            </div>
           </div>
         </div>
         <div className="container-site flex flex-col justify-between gap-4 border-t border-slate-200/70 py-6 text-[10px] leading-relaxed text-slate-400 sm:flex-row sm:items-center">

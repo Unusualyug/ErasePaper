@@ -1,8 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { phoneUrl, whatsappUrl } from '../src/lib/constants.js';
+import { formatPhoneNumber, phoneUrl, SUPPORT_EMAIL, whatsappUrl } from '../src/lib/constants.js';
 
-test('mobile contact actions use the registered WhatsApp conversation and telephone fallback', () => {
+test('support contact details format the business email and India mobile for call and WhatsApp', () => {
+  assert.equal(SUPPORT_EMAIL, 'support@erasepaper.online');
+  assert.equal(formatPhoneNumber(), '+91 98257 51614');
+  assert.equal(formatPhoneNumber('9825751614'), '+91 98257 51614');
   assert.equal(phoneUrl(), 'tel:+919825751614');
   assert.equal(
     whatsappUrl(undefined, 'Hello ErasePaper, I need help.'),

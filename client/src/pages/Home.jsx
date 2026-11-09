@@ -18,10 +18,19 @@ import {
   Send,
   BadgeCheck,
   BookOpenCheck,
+  Mail,
+  Phone,
 } from 'lucide-react';
 import { useServices } from '../context/ServicesContext';
 import { useAppAuth } from '../context/AuthContext';
-import { SERVICE_ICONS, SERVICE_COLORS, whatsappUrl } from '../lib/constants';
+import {
+  SERVICE_ICONS,
+  SERVICE_COLORS,
+  formatPhoneNumber,
+  phoneUrl,
+  SUPPORT_EMAIL,
+  whatsappUrl,
+} from '../lib/constants';
 import { Reveal, CheckItem } from '../components/UI';
 import { WhatsAppIcon } from '../components/WhatsAppButton';
 
@@ -36,7 +45,7 @@ const faqs = [
   ],
   [
     'How do I get started?',
-    'Create an account with an email, username, mobile number, and password. Email and phone are not verified. When live email delivery is configured, we send a welcome email and a receipt when you submit a service request; no email-verification message, OTP, or SMS is sent. The demo sends no emails. Then submit a short service request or contact us directly on WhatsApp to discuss your requirements.',
+    `Create an account with an email, username, mobile number, and password. Email and phone are not verified. When live email delivery is configured, we send a welcome email and a receipt when you submit a service request; no email-verification message, OTP, or SMS is sent. The demo sends no emails. Then submit a short service request or contact us on WhatsApp, email ${SUPPORT_EMAIL}, or call ${formatPhoneNumber()} to discuss your requirements.`,
   ],
   [
     'Is manual creation really included with bulk printing?',
@@ -264,6 +273,19 @@ export default function Home() {
                   Let’s figure it out
                   <ArrowUpRight size={16} />
                 </a>
+                <div className="mt-4 flex flex-col gap-2 text-[10px] font-medium text-brand-100">
+                  <a
+                    href={`mailto:${SUPPORT_EMAIL}`}
+                    className="inline-flex min-h-7 items-center gap-2 break-all hover:text-white"
+                  >
+                    <Mail size={13} className="shrink-0" />
+                    {SUPPORT_EMAIL}
+                  </a>
+                  <a href={phoneUrl()} className="inline-flex min-h-7 items-center gap-2 hover:text-white">
+                    <Phone size={13} className="shrink-0" />
+                    Call {formatPhoneNumber()}
+                  </a>
+                </div>
               </div>
             </Reveal>
           </div>

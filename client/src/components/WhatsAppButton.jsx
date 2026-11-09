@@ -1,6 +1,6 @@
 import { useId, useState } from 'react';
 import { MessageCircle, X, ArrowUpRight } from 'lucide-react';
-import { phoneUrl, whatsappUrl } from '../lib/constants';
+import { formatPhoneNumber, phoneUrl, SUPPORT_EMAIL, whatsappUrl } from '../lib/constants';
 export function WhatsAppIcon({ size = 20, ...props }) {
   return (
     <svg
@@ -60,7 +60,16 @@ export default function WhatsAppButton({ className = '' }) {
           <p className="mt-3 text-center text-xs text-slate-500">
             Prefer a call?{' '}
             <a className="font-semibold text-brand-600 underline underline-offset-2" href={phoneUrl()}>
-              +91 98257 51614
+              {formatPhoneNumber()}
+            </a>
+          </p>
+          <p className="mt-2 text-center text-xs text-slate-500">
+            Prefer email?{' '}
+            <a
+              className="break-all font-semibold text-brand-600 underline underline-offset-2"
+              href={`mailto:${SUPPORT_EMAIL}`}
+            >
+              {SUPPORT_EMAIL}
             </a>
           </p>
         </div>

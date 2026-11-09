@@ -8,6 +8,15 @@ export const SERVICE_COLORS = {
   indigo: 'bg-indigo-50 text-indigo-600',
 };
 export const WHATSAPP_NUMBER = import.meta.env?.VITE_WHATSAPP_NUMBER || '919825751614';
+export const SUPPORT_EMAIL = import.meta.env?.VITE_SUPPORT_EMAIL || 'support@erasepaper.online';
+export const formatPhoneNumber = (number = WHATSAPP_NUMBER) => {
+  const digits = String(number).replace(/\D/g, '');
+  if (digits.startsWith('91') && digits.length === 12) {
+    return `+91 ${digits.slice(2, 7)} ${digits.slice(7)}`;
+  }
+  if (digits.length === 10) return `+91 ${digits.slice(0, 5)} ${digits.slice(5)}`;
+  return `+${digits}`;
+};
 export const GENERAL_MESSAGE = 'Hello ErasePaper, I would like to enquire about your academic services.';
 export const whatsappUrl = (number = WHATSAPP_NUMBER, message = GENERAL_MESSAGE) =>
   `https://wa.me/${number.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;

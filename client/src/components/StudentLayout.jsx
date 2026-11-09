@@ -20,7 +20,7 @@ import { Logo, Avatar } from './UI';
 import WhatsAppButton from './WhatsAppButton';
 import NotificationPanel from './NotificationPanel';
 import { useAppAuth } from '../context/AuthContext';
-import { whatsappUrl } from '../lib/constants';
+import { formatPhoneNumber, whatsappUrl } from '../lib/constants';
 import ThemeControl from './ThemeControl';
 import LegalLinks from './LegalLinks';
 import { useMobileDrawer } from '../hooks/useMobileDrawer';
@@ -133,9 +133,9 @@ export default function StudentLayout() {
               target="_blank"
               rel="noopener noreferrer"
               className="student-whatsapp-link flex min-h-11 items-center justify-between gap-2 rounded-lg border border-emerald-400/20 bg-emerald-500/10 px-3 text-[11px] font-semibold text-emerald-200"
-              aria-label="Contact ErasePaper on WhatsApp at +91 98257 51614"
+              aria-label={`Contact ErasePaper on WhatsApp at ${formatPhoneNumber()}`}
             >
-              WhatsApp · +91 98257 51614
+              WhatsApp · {formatPhoneNumber()}
               <ArrowUpRight size={14} className="shrink-0" />
             </a>
           </div>
