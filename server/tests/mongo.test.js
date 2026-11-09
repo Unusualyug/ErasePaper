@@ -14,6 +14,9 @@ before(async () => {
   replSet = await MongoMemoryReplSet.create({ replSet: { count: 1, storageEngine: 'wiredTiger' } });
   await mongoose.connect(replSet.getUri(), { serverSelectionTimeoutMS: 10000 });
   connection = mongoose.connection;
+  // Simulate a previous deployment's unique phone index; initialization should remove it safely.
+  await connection.createCollection('local_users_v2');
+  await connection.collection('local_users_v2').createIndex({ phoneNumber: 1 }, { unique: true });
   store = createMongoStore(connection);
   await store.initialize();
   await store.services.seed();
@@ -38,8 +41,15 @@ async function newUser(username, phoneNumber, extra = {}) {
   });
 }
 
-test('local repository enforces username, mobile and email uniqueness while isolating fresh accounts', async () => {
+test('local repository enforces username and email uniqueness, allows shared phones, and isolates fresh accounts', async () => {
   assert.equal((await store.services.list()).length, 5);
+  const indexes = await connection.collection('local_users_v2').indexes();
+  assert.ok(
+    !indexes.some(
+      (index) => index.unique && Object.keys(index.key).length === 1 && index.key.phoneNumber === 1,
+    ),
+    'the legacy unique phone index should be removed on initialization',
+  );
   const legacy = await connection.collection('users').insertOne({
     clerkUserId: 'legacy_clerk_record',
     fullName: 'Legacy user untouched',
@@ -62,7 +72,10 @@ test('local repository enforces username, mobile and email uniqueness while isol
   assert.ok(user._id);
   assert.equal(user.role, 'student');
   await assert.rejects(newUser('mongo_user', '+919123456704'), (error) => error.code === 11000);
-  await assert.rejects(newUser('another_user', '+919123456703'), (error) => error.code === 11000);
+  const sharedPhoneUser = await newUser('another_user', '+919123456703', {
+    email: 'shared.phone@example.com',
+  });
+  assert.equal(sharedPhoneUser.phoneNumber, user.phoneNumber);
   await assert.rejects(
     newUser('another_email_user', '+919123456704', { email: 'MONGO@EXAMPLE.COM' }),
     (error) => error.code === 11000,

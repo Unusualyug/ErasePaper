@@ -63,6 +63,18 @@ export function createMongoStore(connection) {
           AnalyticsRevocation,
         ].map((model) => model.createCollection()),
       );
+      // Remove the former unique phone index so existing live databases permit shared contact numbers.
+      const userIndexes = await User.collection.indexes();
+      for (const index of userIndexes) {
+        const keys = Object.keys(index.key || {});
+        if (index.unique && keys.length === 1 && keys[0] === 'phoneNumber') {
+          try {
+            await User.collection.dropIndex(index.name);
+          } catch (error) {
+            if (error.code !== 27 && error.codeName !== 'IndexNotFound') throw error;
+          }
+        }
+      }
       await Promise.all(
         [
           User,
@@ -115,9 +127,6 @@ export function createMongoStore(connection) {
             .limit(2)
             .lean(),
         );
-      },
-      async findByPhone(phoneNumber) {
-        return plain(await User.findOne({ phoneNumber }).lean());
       },
       async create(values, tx) {
         const [user] = await User.create([{ studentId: newStudentId(), ...values }], options(tx));

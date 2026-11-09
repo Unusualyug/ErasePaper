@@ -74,16 +74,12 @@ export function createMemoryStore() {
       async findByEmailNormalized(emailNormalized) {
         return clone(data.users.filter((u) => normalizedEmail(u) === emailNormalized).slice(0, 2));
       },
-      async findByPhone(phone) {
-        return clone(data.users.find((u) => u.phoneNumber === phone));
-      },
       async create(values) {
         const emailNormalized = values.emailNormalized || (values.email || '').trim().toLowerCase();
         if (
           data.users.some(
             (u) =>
               u.usernameNormalized === values.usernameNormalized ||
-              u.phoneNumber === values.phoneNumber ||
               (emailNormalized && normalizedEmail(u) === emailNormalized),
           )
         ) {

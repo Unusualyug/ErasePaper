@@ -38,17 +38,12 @@ export function createAuthController(store, auth) {
       const usernameNormalized = input.username.toLocaleLowerCase('en-US');
       const email = input.email.trim();
       const emailNormalized = email.toLocaleLowerCase('en-US');
-      const [existingUsername, existingPhone, existingEmails] = await Promise.all([
+      const [existingUsername, existingEmails] = await Promise.all([
         store.users.findByUsernameNormalized(usernameNormalized),
-        store.users.findByPhone(input.phoneNumber),
         store.users.findByEmailNormalized(emailNormalized),
       ]);
-      if (existingUsername || existingPhone || existingEmails.length)
-        throw new AppError(
-          409,
-          'That username, email, or mobile number is already registered.',
-          'ACCOUNT_CONFLICT',
-        );
+      if (existingUsername || existingEmails.length)
+        throw new AppError(409, 'That username or email is already registered.', 'ACCOUNT_CONFLICT');
 
       let user;
       try {
@@ -67,11 +62,7 @@ export function createAuthController(store, auth) {
         });
       } catch (error) {
         if (error.code === 11000)
-          throw new AppError(
-            409,
-            'That username, email, or mobile number is already registered.',
-            'ACCOUNT_CONFLICT',
-          );
+          throw new AppError(409, 'That username or email is already registered.', 'ACCOUNT_CONFLICT');
         throw error;
       }
 

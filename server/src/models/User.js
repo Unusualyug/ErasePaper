@@ -7,7 +7,7 @@ const schema = new mongoose.Schema(
     usernameNormalized: { type: String, required: true, unique: true },
     passwordHash: { type: String, required: true, select: false },
     fullName: { type: String, required: true, maxlength: 100 },
-    phoneNumber: { type: String, required: true, unique: true },
+    phoneNumber: { type: String, required: true },
     email: { type: String, default: '' },
     emailNormalized: { type: String, unique: true, sparse: true, maxlength: 254 },
     role: { type: String, enum: ['student', 'admin'], default: 'student' },

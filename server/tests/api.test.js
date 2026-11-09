@@ -157,7 +157,7 @@ test('registration requires email and sign-in is email-only with an HTTP-only co
       password: 'Another-Unique-2026!',
     })
     .expect(409);
-  await request(app)
+  const sharedMobileAccount = await request(app)
     .post('/api/auth/register')
     .send({
       username: 'another_user',
@@ -165,7 +165,9 @@ test('registration requires email and sign-in is email-only with an HTTP-only co
       phoneNumber: '+919123456701',
       password: 'Another-Unique-2026!',
     })
-    .expect(409);
+    .expect(201);
+  assert.equal(sharedMobileAccount.body.user.phoneNumber, '+919123456701');
+  assert.equal(sharedMobileAccount.body.user.email, 'duplicate.phone@example.com');
   await request(app)
     .post('/api/auth/register')
     .send({
