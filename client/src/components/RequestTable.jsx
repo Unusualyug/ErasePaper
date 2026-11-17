@@ -105,7 +105,10 @@ export default function RequestTable({
               const service = services.find((item) => item.slug === request.serviceSlug);
               const Icon = SERVICE_ICONS[service?.icon] || ArrowUpRight;
               return (
-                <tr key={request.id} className="group transition hover:bg-slate-50/80">
+                <tr
+                  key={request.id}
+                  className={`group transition ${admin ? 'admin-request-row' : 'hover:bg-slate-50/80'}`}
+                >
                   <td className="table-cell max-w-[260px]">
                     <button
                       type="button"

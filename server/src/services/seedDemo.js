@@ -91,19 +91,6 @@ export async function seedDemo(store) {
       },
     ],
     [
-      'bulk-printing',
-      'Semester 6 laboratory manuals — 30 copies',
-      'Please quote for printing and spiral binding our laboratory manuals. We also need help arranging the manual documents.',
-      {
-        documentType: 'Laboratory manual',
-        copies: 30,
-        pageCount: 84,
-        printType: 'Black & white',
-        binding: 'Spiral',
-        deliveryAddress: 'College department office, Ahmedabad, Gujarat 380015',
-      },
-    ],
-    [
       'final-year-project',
       'IoT-based smart irrigation — project mentoring',
       'I am building a smart irrigation prototype and need mentoring on implementation, report documentation and presentation preparation.',
@@ -114,9 +101,22 @@ export async function seedDemo(store) {
         projectStage: 'Implementation',
       },
     ],
+    [
+      'social-media-marketing',
+      'Instagram content plan for a local café',
+      'We would like an account review, a content plan, promotional posts and reels, and regular performance reporting for our local business.',
+      {
+        businessName: 'Demo Café',
+        instagramHandle: '@demo.cafe',
+        industry: 'Food and beverage',
+        primaryGoal: 'Increase brand awareness',
+        supportNeeded: 'End-to-end Instagram management',
+        targetAudience: 'Local café customers in Ahmedabad',
+      },
+    ],
   ];
   for (let i = 0; i < 48; i++) {
-    const [serviceSlug, title, description, details] = topics[i % 5];
+    const [serviceSlug, title, description, details] = topics[i % topics.length];
     const service = SERVICES.find((s) => s.slug === serviceSlug);
     const student = students[i < 5 ? 0 : (i - 5) % students.length];
     const status = i < 9 ? 'Pending' : i < 23 ? 'In Progress' : i < 44 ? 'Completed' : 'Cancelled';
@@ -127,7 +127,12 @@ export async function seedDemo(store) {
       title: i < 5 ? title : `${title}${i > 23 ? ` — cohort ${Math.floor(i / 5) + 1}` : ''}`,
       description,
       additionalInfo: i % 3 === 0 ? 'Please contact me on WhatsApp to discuss the next steps.' : '',
-      details: { ...details, deadline: new Date(Date.now() + 10 * 86400000).toISOString().slice(0, 10) },
+      details: {
+        ...details,
+        ...(serviceSlug === 'social-media-marketing'
+          ? { preferredStartDate: new Date(Date.now() + 10 * 86400000).toISOString().slice(0, 10) }
+          : { deadline: new Date(Date.now() + 10 * 86400000).toISOString().slice(0, 10) }),
+      },
       status,
       adminNotes:
         status === 'Completed'
@@ -152,8 +157,8 @@ export async function seedDemo(store) {
   for (const student of students.slice(-5))
     await store.notifications.create({
       type: 'registration',
-      title: 'A new student joined',
-      message: 'A student account was created and is ready to explore.',
+      title: 'A new account joined',
+      message: 'An account was created and is ready to explore.',
       relatedUserId: String(student._id),
       createdAt: student.createdAt,
       readAt: ago(0),

@@ -149,7 +149,7 @@ export default function Requests() {
           <Spinner label="Loading requests…" />
         ) : data?.items.length ? (
           <>
-            <div className={`bg-white transition-opacity ${loading ? 'opacity-50' : ''}`}>
+            <div className="transition-opacity" aria-busy={loading}>
               <RequestTable requests={data.items} onSelect={setSelected} admin compact />
             </div>
             <div className="[&_button]:border-white/10 [&_button]:bg-transparent [&_button]:text-slate-400">

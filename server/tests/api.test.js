@@ -48,15 +48,22 @@ before(async () => {
 });
 after(() => deletion.stop());
 
-test('public configuration is explicitly demo, with the four active services', async () => {
+test('public configuration is explicitly demo, with the five active services', async () => {
   const config = await request(app).get('/api/config').expect(200);
   assert.equal(config.body.mode, 'demo');
   const services = await request(app).get('/api/services').expect(200);
-  assert.equal(services.body.services.length, 4);
+  assert.equal(services.body.services.length, 5);
+  const socialService = services.body.services.find((service) => service.slug === 'social-media-marketing');
+  assert.equal(socialService?.shortName, 'Social media marketing');
+  assert.ok(socialService?.fields.some((field) => field.key === 'instagramHandle'));
   assert.equal(
     services.body.services.some((service) => service.slug === 'bulk-printing'),
     false,
   );
+  await request(app)
+    .post('/api/analytics/aggregate-page-view')
+    .send({ path: '/sign-up', serviceSlug: 'social-media-marketing' })
+    .expect(204);
 });
 test('public contact number changes are admin-only, confirmed by the API, and audit-log safely', async () => {
   await request(app).get('/api/admin/control-users').expect(401);
@@ -130,7 +137,7 @@ test('retired-service history remains readable after the active catalog is seede
 
   await store.services.seed();
   assert.equal(store.data.services.find((service) => service.slug === 'bulk-printing').active, false);
-  assert.equal((await store.services.list()).length, 4);
+  assert.equal((await store.services.list()).length, 5);
 
   const studentView = await request(app)
     .get(`/api/requests/${historicalRequest._id}`)
@@ -387,6 +394,40 @@ test('dynamic service requirements are validated server-side', async () => {
     .post('/api/requests')
     .set('Cookie', studentCookie)
     .send({ ...payload, serviceSlug: 'unknown-service' })
+    .expect(400);
+
+  const marketingPayload = {
+    serviceSlug: 'social-media-marketing',
+    title: 'Instagram support for Demo Cafe',
+    description: 'We need a content plan and account support for our local café.',
+    integrityAcknowledged: true,
+    details: {
+      businessName: 'Demo Café',
+      instagramHandle: '@demo.cafe',
+      industry: 'Food and beverage',
+      primaryGoal: 'Increase brand awareness',
+      supportNeeded: 'End-to-end Instagram management',
+      targetAudience: 'Local café customers in Ahmedabad',
+      preferredStartDate: '2026-12-15',
+    },
+  };
+  const marketingResult = await request(app)
+    .post('/api/requests')
+    .set('Cookie', studentCookie)
+    .send(marketingPayload)
+    .expect(201);
+  assert.equal(
+    marketingResult.body.request.serviceType,
+    'Social Media Management & Digital Marketing Services',
+  );
+  assert.equal(marketingResult.body.request.details.instagramHandle, '@demo.cafe');
+  await request(app)
+    .post('/api/requests')
+    .set('Cookie', studentCookie)
+    .send({
+      ...marketingPayload,
+      details: { ...marketingPayload.details, supportNeeded: 'Guaranteed followers' },
+    })
     .expect(400);
 });
 test('students can read only their own requests and requirements', async () => {

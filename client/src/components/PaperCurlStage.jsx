@@ -61,7 +61,7 @@ function getDimensions(camera, width, height) {
 const BRAND_TEXTURE_MAX_SIZE = 1024;
 const BRAND_WRITE_FINISH = 1.62;
 const BRAND_NAME = 'ErasePaper';
-const BRAND_TAGLINE = 'Simplifying Academic Life.';
+const BRAND_TAGLINE = 'Academic & Business Support, Simplified.';
 
 function getBrandTextureDimensions(pageRatio) {
   const ratio = Math.max(0.55, Math.min(1.55, pageRatio));

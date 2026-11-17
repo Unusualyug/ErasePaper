@@ -94,8 +94,8 @@ export function createAuthController(store, auth) {
 
       await store.notifications.create({
         type: 'registration',
-        title: 'A new student joined',
-        message: 'A new student account was created.',
+        title: 'A new account joined',
+        message: 'A new account was created.',
         relatedUserId: String(user._id),
       });
       await store.logs.create({

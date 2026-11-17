@@ -45,11 +45,11 @@ async function newUser(username, phoneNumber, extra = {}) {
 }
 
 test('local repository enforces username and email uniqueness, allows shared phones, and isolates fresh accounts', async () => {
-  assert.equal((await store.services.list()).length, 4);
+  assert.equal((await store.services.list()).length, 5);
   await Service.create({ slug: 'bulk-printing', name: 'Retired service', active: true });
   await store.services.seed();
   assert.equal(await Service.exists({ slug: 'bulk-printing', active: true }), null);
-  assert.equal((await store.services.list()).length, 4);
+  assert.equal((await store.services.list()).length, 5);
   await store.withTransaction(async (tx) => store.settings.set('publicWhatsappNumber', '14155552671', tx));
   assert.equal(await store.settings.get('publicWhatsappNumber'), '14155552671');
   assert.equal((await SiteSetting.findOne({ key: 'publicWhatsappNumber' }).lean()).value, '14155552671');
@@ -297,7 +297,7 @@ test('dashboard and student summary use database aggregation', async () => {
   assert.equal(summary.total, 1);
   assert.equal(summary.completed, 1);
   const dashboard = await store.dashboard();
-  assert.equal(dashboard.services.length, 4);
+  assert.equal(dashboard.services.length, 5);
   assert.equal(dashboard.months.length, 6);
   assert.ok(dashboard.students >= 1);
   const search = await store.users.list({ search: 'mongo_user', page: 1, limit: 1 });

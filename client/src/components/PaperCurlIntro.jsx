@@ -47,7 +47,7 @@ function FallbackPaper() {
       <div className="paper-intro__fallback-paper">
         <div className="paper-intro__fallback-brand">
           <span className="paper-intro__fallback-brand-name">ErasePaper</span>
-          <span className="paper-intro__fallback-tagline">Simplifying Academic Life.</span>
+          <span className="paper-intro__fallback-tagline">Academic &amp; Business Support, Simplified.</span>
         </div>
         <div className="paper-intro__fallback-curl" />
       </div>
@@ -162,7 +162,7 @@ function PaperCurlIntroLayer({ contentReady }) {
       onAnimationComplete={finishFade}
     >
       <h2 id="paper-intro-title" className="paper-intro__sr-only">
-        ErasePaper. Simplifying Academic Life.
+        ErasePaper. Academic and business support, simplified.
       </h2>
       <div className="paper-intro__stage" aria-hidden="true">
         {renderMode === 'three' && Stage && animationStartedAt !== null ? (
