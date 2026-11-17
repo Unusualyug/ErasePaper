@@ -1,3 +1,9 @@
+<!-- for creating admin
+
+npm run admin:create -- <registered-username>
+
+ -->
+
 # ErasePaper
 
 **Simplifying Academic Life.** A JavaScript/JSX academic-services workspace with a student portal and a separate, server-protected administration dashboard.
