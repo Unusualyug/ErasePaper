@@ -2,6 +2,9 @@
 
 npm run admin:create -- <registered-username>
 
+to know the number of admins
+
+node --input-type=module -e 'import "dotenv/config"; import mongoose from "mongoose"; if (!process.env.MONGODB_URI) throw new Error("MONGODB_URI is not set"); await mongoose.connect(process.env.MONGODB_URI); try { const admins = await mongoose.connection.collection("local_users_v2").find({ role: "admin", state: "active" }, { projection: { _id: 0, email: 1, username: 1 } }).toArray(); console.table(admins); } finally { await mongoose.disconnect(); }'
  -->
 
 # ErasePaper
