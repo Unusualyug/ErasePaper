@@ -193,7 +193,7 @@ export default function Home() {
               />
               <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#cfc4f2]/30 to-transparent" />
             </div>
-            <div className="absolute -left-2 top-20 flex items-center gap-2.5 rounded-xl border border-white bg-white p-3 pr-5 shadow-soft sm:-left-6">
+            <div className="absolute -left-2 -top-4 flex items-center gap-2.5 rounded-xl border border-white bg-white p-3 pr-5 shadow-soft sm:-left-6 sm:top-20">
               <span className="rounded-lg bg-brand-50 p-2 text-brand-600">
                 <BookOpenCheck size={20} />
               </span>
@@ -218,8 +218,8 @@ export default function Home() {
         </div>
       </section>
       <section className="border-y border-slate-100 bg-[#fafbfe]">
-        <div className="container-site flex flex-wrap items-center justify-between gap-6 py-7">
-          <p className="text-[11px] font-medium leading-5 text-slate-400">
+        <div className="container-site grid grid-cols-2 items-start gap-x-4 gap-y-5 py-6 sm:flex sm:flex-wrap sm:items-center sm:justify-between sm:gap-6 sm:py-7">
+          <p className="col-span-2 text-[11px] font-medium leading-5 text-slate-400 sm:col-span-1">
             Made for the moments
             <br />
             <span className="font-semibold text-navy-700">that matter in your education.</span>
@@ -230,9 +230,12 @@ export default function Home() {
             [Layers3, 'Organise your research'],
             [BadgeCheck, 'Track your progress'],
           ].map(([Icon, text]) => (
-            <span key={text} className="flex items-center gap-2.5 text-[12px] font-semibold text-navy-500">
-              <Icon size={21} strokeWidth={1.5} className="text-slate-400" />
-              {text}
+            <span
+              key={text}
+              className="flex min-w-0 items-center gap-2.5 text-[12px] font-semibold leading-5 text-navy-500 sm:min-w-[auto]"
+            >
+              <Icon size={21} strokeWidth={1.5} className="shrink-0 text-slate-400 sm:shrink" />
+              <span>{text}</span>
             </span>
           ))}
         </div>
