@@ -6,6 +6,7 @@ import { ArrowUpRight, Menu, X, ArrowRight, ShieldCheck, UserRound, LogIn, Mail,
 import { Logo } from './UI';
 import WhatsAppButton, { WhatsAppIcon } from './WhatsAppButton';
 import { useAppAuth } from '../context/AuthContext';
+import { useSiteConfig } from '../context/SiteConfigContext';
 import { formatPhoneNumber, phoneUrl, SUPPORT_EMAIL, whatsappUrl } from '../lib/constants';
 import ThemeControl from './ThemeControl';
 import LegalLinks from './LegalLinks';
@@ -22,6 +23,7 @@ export default function PublicLayout() {
   const menuTriggerRef = useRef(null);
   const menuRef = useRef(null);
   const { user, mode } = useAppAuth();
+  const { whatsappNumber } = useSiteConfig();
   useEffect(() => {
     if (!menu) return undefined;
     menuRef.current?.querySelector('a')?.focus();
@@ -125,16 +127,16 @@ export default function PublicLayout() {
                 </Link>
               ))}
               <a
-                href={whatsappUrl()}
+                href={whatsappUrl(whatsappNumber)}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={`Contact ErasePaper on WhatsApp at ${formatPhoneNumber()}`}
+                aria-label={`Contact ErasePaper on WhatsApp at ${formatPhoneNumber(whatsappNumber)}`}
                 className="public-menu-whatsapp mt-2 flex min-h-11 items-center justify-between gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 text-xs font-semibold text-emerald-800"
                 onClick={() => setMenu(false)}
               >
                 <span className="flex items-center gap-2">
                   <WhatsAppIcon size={17} />
-                  WhatsApp · {formatPhoneNumber()}
+                  WhatsApp · {formatPhoneNumber(whatsappNumber)}
                 </span>
                 <ArrowUpRight size={15} />
               </a>
@@ -221,12 +223,15 @@ export default function PublicLayout() {
                 <Mail size={15} className="shrink-0 text-brand-600" />
                 {SUPPORT_EMAIL}
               </a>
-              <a href={phoneUrl()} className="inline-flex min-h-8 items-center gap-2 hover:text-brand-600">
+              <a
+                href={phoneUrl(whatsappNumber)}
+                className="inline-flex min-h-8 items-center gap-2 hover:text-brand-600"
+              >
                 <Phone size={15} className="shrink-0 text-brand-600" />
-                {formatPhoneNumber()}
+                {formatPhoneNumber(whatsappNumber)}
               </a>
               <a
-                href={whatsappUrl()}
+                href={whatsappUrl(whatsappNumber)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex min-h-8 items-center gap-2 hover:text-brand-600"

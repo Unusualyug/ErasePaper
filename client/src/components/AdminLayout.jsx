@@ -15,6 +15,7 @@ import {
   ShieldCheck,
   LockKeyhole,
   Settings2,
+  Phone,
   LoaderCircle,
 } from 'lucide-react';
 import { Logo, Avatar } from './UI';
@@ -28,6 +29,7 @@ import { useMobileDrawer } from '../hooks/useMobileDrawer';
 const nav = [
   { to: '/admin', label: 'Overview', icon: LayoutDashboard },
   { to: '/admin/students', label: 'Students', icon: UsersRound },
+  { to: '/admin/control-users', label: 'Control Users', icon: Phone },
   { to: '/admin/requests', label: 'Service requests', icon: Files },
   { to: '/admin/activity', label: 'Activity & audit log', icon: Activity },
   { to: '/admin/analytics', label: 'Website analytics', icon: ChartNoAxesCombined },

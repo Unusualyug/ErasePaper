@@ -24,6 +24,7 @@ export function createMemoryStore() {
     passwordResetTokens: [],
     requests: [],
     services: SERVICES.map((s) => ({ ...clone(s), _id: s.slug, active: true })),
+    siteSettings: {},
     logs: [],
     notifications: [],
     jobs: [],
@@ -226,6 +227,15 @@ export function createMemoryStore() {
       },
       async removeForUser(userId) {
         data.requests = data.requests.filter((r) => !matchesId(r.userId, userId));
+      },
+    },
+    settings: {
+      async get(key) {
+        return data.siteSettings[key] ?? null;
+      },
+      async set(key, value) {
+        data.siteSettings[key] = value;
+        return value;
       },
     },
     services: {

@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import User from '../models/User.js';
 import ServiceRequest from '../models/ServiceRequest.js';
 import Service from '../models/Service.js';
+import SiteSetting from '../models/SiteSetting.js';
 import Notification from '../models/Notification.js';
 import AdminLog from '../models/AdminLog.js';
 import DeletionJob from '../models/DeletionJob.js';
@@ -52,6 +53,7 @@ export function createMongoStore(connection) {
           User,
           ServiceRequest,
           Service,
+          SiteSetting,
           Notification,
           AdminLog,
           DeletionJob,
@@ -82,6 +84,7 @@ export function createMongoStore(connection) {
           User,
           ServiceRequest,
           Service,
+          SiteSetting,
           Notification,
           AdminLog,
           DeletionJob,
@@ -283,6 +286,20 @@ export function createMongoStore(connection) {
       },
       async removeForUser(userId, tx) {
         await ServiceRequest.deleteMany({ userId }, options(tx));
+      },
+    },
+    settings: {
+      async get(key, tx) {
+        const setting = await SiteSetting.findOne({ key }, null, options(tx)).lean();
+        return setting?.value ?? null;
+      },
+      async set(key, value, tx) {
+        const setting = await SiteSetting.findOneAndUpdate(
+          { key },
+          { $set: { value } },
+          { upsert: true, new: true, setDefaultsOnInsert: true, ...options(tx) },
+        ).lean();
+        return setting?.value ?? value;
       },
     },
     services: {

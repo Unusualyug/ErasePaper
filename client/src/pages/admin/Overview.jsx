@@ -33,6 +33,7 @@ const actionLabels = {
   'request.notes_updated': 'Internal request notes updated',
   'request.cancelled': 'Request cancelled by student',
   'admin.role_granted': 'Administrator access granted',
+  'site.contact_number_updated': 'Website contact number updated',
 };
 export { actionLabels };
 export default function Overview() {

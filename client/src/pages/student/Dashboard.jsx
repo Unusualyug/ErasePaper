@@ -17,6 +17,7 @@ import {
   Phone,
 } from 'lucide-react';
 import { useAppAuth } from '../../context/AuthContext';
+import { useSiteConfig } from '../../context/SiteConfigContext';
 import { useServices } from '../../context/ServicesContext';
 import { useApi } from '../../hooks/useApi';
 import {
@@ -34,6 +35,7 @@ import RequestDetails from '../../components/RequestDetails';
 import { WhatsAppIcon } from '../../components/WhatsAppButton';
 export default function Dashboard() {
   const { user } = useAppAuth();
+  const { whatsappNumber } = useSiteConfig();
   const services = useServices();
   const [selected, setSelected] = useState(null);
   const { data, loading, error, refresh: refreshRequests } = useApi('/requests?limit=5');
@@ -208,7 +210,7 @@ export default function Dashboard() {
               Questions about a service or an existing request? We’re just a message away.
             </p>
             <a
-              href={whatsappUrl()}
+              href={whatsappUrl(whatsappNumber)}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-secondary btn-sm mt-4 w-full"
@@ -225,11 +227,11 @@ export default function Dashboard() {
                 {SUPPORT_EMAIL}
               </a>
               <a
-                href={phoneUrl()}
+                href={phoneUrl(whatsappNumber)}
                 className="flex min-h-8 items-center gap-2 text-slate-600 hover:text-brand-700"
               >
                 <Phone size={13} className="shrink-0 text-brand-600" />
-                {formatPhoneNumber()}
+                {formatPhoneNumber(whatsappNumber)}
               </a>
             </div>
           </section>

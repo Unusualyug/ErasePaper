@@ -1,5 +1,6 @@
 import { useId, useState } from 'react';
 import { MessageCircle, X, ArrowUpRight } from 'lucide-react';
+import { useSiteConfig } from '../context/SiteConfigContext';
 import { formatPhoneNumber, phoneUrl, SUPPORT_EMAIL, whatsappUrl } from '../lib/constants';
 export function WhatsAppIcon({ size = 20, ...props }) {
   return (
@@ -22,6 +23,7 @@ export function WhatsAppIcon({ size = 20, ...props }) {
 export default function WhatsAppButton({ className = '' }) {
   const [open, setOpen] = useState(false);
   const promptId = useId();
+  const { whatsappNumber } = useSiteConfig();
   return (
     <div
       className={`whatsapp-floating ${className} fixed bottom-5 right-3 z-40 flex flex-col items-end gap-3 print:hidden sm:bottom-6 sm:right-6`}
@@ -49,7 +51,7 @@ export default function WhatsAppButton({ className = '' }) {
             Have a question? Talk to us directly on WhatsApp.
           </p>
           <a
-            href={whatsappUrl()}
+            href={whatsappUrl(whatsappNumber)}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-4 flex items-center justify-between rounded-lg bg-[#168c62] px-4 py-3 text-sm font-semibold text-white"
@@ -59,8 +61,11 @@ export default function WhatsAppButton({ className = '' }) {
           </a>
           <p className="mt-3 text-center text-xs text-slate-500">
             Prefer a call?{' '}
-            <a className="font-semibold text-brand-600 underline underline-offset-2" href={phoneUrl()}>
-              {formatPhoneNumber()}
+            <a
+              className="font-semibold text-brand-600 underline underline-offset-2"
+              href={phoneUrl(whatsappNumber)}
+            >
+              {formatPhoneNumber(whatsappNumber)}
             </a>
           </p>
           <p className="mt-2 text-center text-xs text-slate-500">

@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ExternalLink, ShieldCheck } from 'lucide-react';
 import { useCookieConsent } from '../context/CookieConsentContext';
+import { useSiteConfig } from '../context/SiteConfigContext';
 import { formatPhoneNumber, phoneUrl, SUPPORT_EMAIL, whatsappUrl } from '../lib/constants';
 
 function LegalPage({ title, eyebrow, intro, children }) {
+  const { whatsappNumber } = useSiteConfig();
   return (
     <div className="legal-page container-site mx-auto max-w-[920px] py-12 sm:py-16">
       <Link to="/" className="legal-back-link">
@@ -23,8 +25,8 @@ function LegalPage({ title, eyebrow, intro, children }) {
           <a href={`mailto:${SUPPORT_EMAIL}`} className="font-semibold underline underline-offset-2">
             {SUPPORT_EMAIL}
           </a>
-          , call <a href={phoneUrl()}>{formatPhoneNumber()}</a>, or{' '}
-          <a href={whatsappUrl()} target="_blank" rel="noopener noreferrer">
+          , call <a href={phoneUrl(whatsappNumber)}>{formatPhoneNumber(whatsappNumber)}</a>, or{' '}
+          <a href={whatsappUrl(whatsappNumber)} target="_blank" rel="noopener noreferrer">
             message us on WhatsApp
           </a>
           . Please do not include your password in a message.
@@ -240,6 +242,7 @@ export function CookiePolicy() {
 }
 
 export function TermsAndConditions() {
+  const { whatsappNumber } = useSiteConfig();
   return (
     <LegalPage
       eyebrow="Using ErasePaper"
@@ -288,10 +291,11 @@ export function TermsAndConditions() {
         <p>
           Questions about these terms can be emailed to{' '}
           <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>, sent by{' '}
-          <a href={whatsappUrl()} target="_blank" rel="noopener noreferrer">
+          <a href={whatsappUrl(whatsappNumber)} target="_blank" rel="noopener noreferrer">
             WhatsApp
           </a>
-          , or discussed by phone at <a href={phoneUrl()}>{formatPhoneNumber()}</a>. The operator should add
+          , or discussed by phone at{' '}
+          <a href={phoneUrl(whatsappNumber)}>{formatPhoneNumber(whatsappNumber)}</a>. The operator should add
           its legal business details and any governing-law or dispute-resolution terms required for its
           jurisdiction before production launch.
         </p>

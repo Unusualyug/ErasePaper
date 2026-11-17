@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { useServices } from '../context/ServicesContext';
 import { useAppAuth } from '../context/AuthContext';
+import { useSiteConfig } from '../context/SiteConfigContext';
 import {
   SERVICE_ICONS,
   SERVICE_COLORS,
@@ -44,7 +45,7 @@ const faqs = [
   ],
   [
     'How do I get started?',
-    `Create an account with an email, username, mobile number, and password. Email and phone are not verified. When live email delivery is configured, we send a welcome email and a receipt when you submit a service request; no email-verification message, OTP, or SMS is sent. The demo sends no emails. Then submit a short service request or contact us on WhatsApp, email ${SUPPORT_EMAIL}, or call ${formatPhoneNumber()} to discuss your requirements.`,
+    `Create an account with an email, username, mobile number, and password. Email and phone are not verified. When live email delivery is configured, we send a welcome email and a receipt when you submit a service request; no email-verification message, OTP, or SMS is sent. The demo sends no emails. Then submit a short service request or contact us on WhatsApp, email ${SUPPORT_EMAIL}, or call our support number shown below to discuss your requirements.`,
   ],
   [
     'Can I track my request after submitting it?',
@@ -55,7 +56,7 @@ const faqs = [
     'ErasePaper uses your email address and password to sign you in. Passwords are stored as one-way hashes, and your requests are accessible only to you and authorized administrators. Email addresses and mobile numbers are not verified. When live email delivery is configured, welcome and service-request receipt emails may be sent; no verification email or SMS is sent.',
   ],
 ];
-function ServiceCard({ service, index, user }) {
+function ServiceCard({ service, index, user, whatsappNumber }) {
   const Icon = SERVICE_ICONS[service.icon] || BookOpenCheck;
   return (
     <Reveal delay={(index % 3) * 0.06} className="h-full">
@@ -90,7 +91,10 @@ function ServiceCard({ service, index, user }) {
             <ArrowRight size={15} className="service-arrow" />
           </Link>
           <a
-            href={whatsappUrl(undefined, `Hello ErasePaper, I would like to enquire about ${service.name}.`)}
+            href={whatsappUrl(
+              whatsappNumber,
+              `Hello ErasePaper, I would like to enquire about ${service.name}.`,
+            )}
             target="_blank"
             rel="noopener noreferrer"
             aria-label={`Enquire about ${service.name} on WhatsApp`}
@@ -106,6 +110,7 @@ function ServiceCard({ service, index, user }) {
 export default function Home() {
   const services = useServices();
   const { user } = useAppAuth();
+  const { whatsappNumber } = useSiteConfig();
   const [faq, setFaq] = useState(0);
   const reduced = useReducedMotion();
   return (
@@ -147,7 +152,12 @@ export default function Home() {
                 Explore our services
                 <ArrowRight size={17} />
               </a>
-              <a href={whatsappUrl()} target="_blank" rel="noopener noreferrer" className="btn-secondary">
+              <a
+                href={whatsappUrl(whatsappNumber)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-secondary"
+              >
                 <WhatsAppIcon size={19} className="text-[#168c62]" />
                 Contact us on WhatsApp
               </a>
@@ -244,7 +254,13 @@ export default function Home() {
           </Reveal>
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {services.map((service, index) => (
-              <ServiceCard key={service.slug} service={service} index={index} user={user} />
+              <ServiceCard
+                key={service.slug}
+                service={service}
+                index={index}
+                user={user}
+                whatsappNumber={whatsappNumber}
+              />
             ))}
             <Reveal delay={0.12} className="h-full">
               <div className="flex h-full min-h-[240px] flex-col justify-center rounded-xl bg-brand-600 sm:min-h-[300px] p-7 text-white">
@@ -260,7 +276,7 @@ export default function Home() {
                   Tell us what you’re working on. We’ll help you find the right next step.
                 </p>
                 <a
-                  href={whatsappUrl()}
+                  href={whatsappUrl(whatsappNumber)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex w-fit items-center gap-4 rounded-lg bg-white px-4 py-3 text-xs font-bold text-brand-700 transition hover:bg-brand-50"
@@ -276,9 +292,12 @@ export default function Home() {
                     <Mail size={13} className="shrink-0" />
                     {SUPPORT_EMAIL}
                   </a>
-                  <a href={phoneUrl()} className="inline-flex min-h-7 items-center gap-2 hover:text-white">
+                  <a
+                    href={phoneUrl(whatsappNumber)}
+                    className="inline-flex min-h-7 items-center gap-2 hover:text-white"
+                  >
                     <Phone size={13} className="shrink-0" />
-                    Call {formatPhoneNumber()}
+                    Call {formatPhoneNumber(whatsappNumber)}
                   </a>
                 </div>
               </div>
@@ -436,7 +455,7 @@ export default function Home() {
               Can’t find what you’re looking for? We’re happy to help you figure it out.
             </p>
             <a
-              href={whatsappUrl()}
+              href={whatsappUrl(whatsappNumber)}
               target="_blank"
               rel="noopener noreferrer"
               className="mt-6 inline-flex items-center gap-2 text-xs font-semibold text-brand-600"

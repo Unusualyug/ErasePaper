@@ -7,6 +7,13 @@ export const SERVICE_COLORS = {
   indigo: 'bg-indigo-50 text-indigo-600',
 };
 export const WHATSAPP_NUMBER = import.meta.env?.VITE_WHATSAPP_NUMBER || '919825751614';
+export const normalizeContactNumber = (value) => {
+  const input = String(value ?? '').trim();
+  if (input.length > 32 || !/^\+?[1-9][0-9\s().-]*[0-9]$/.test(input)) return '';
+  const digits = input.replace(/\D/g, '');
+  if (!input.startsWith('+') && digits.length < 11) return '';
+  return /^[1-9]\d{7,14}$/.test(digits) ? digits : '';
+};
 export const SUPPORT_EMAIL = import.meta.env?.VITE_SUPPORT_EMAIL || 'support@erasepaper.online';
 export const formatPhoneNumber = (number = WHATSAPP_NUMBER) => {
   const digits = String(number).replace(/\D/g, '');

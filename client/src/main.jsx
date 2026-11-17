@@ -20,6 +20,7 @@ import '@fontsource/inter/700.css';
 import './index.css';
 import './styles/analytics.css';
 import api from './lib/api';
+import { WHATSAPP_NUMBER, normalizeContactNumber } from './lib/constants';
 import { getScrollPlan } from './lib/navigation';
 import { safeReturnPath } from './lib/preferences';
 import { CookieConsentProvider } from './context/CookieConsentContext';
@@ -27,6 +28,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { LocalAuthProvider, useAppAuth } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 import { ServicesProvider } from './context/ServicesContext';
+import { SiteConfigProvider } from './context/SiteConfigContext';
 import CookieConsentExperience from './components/CookieConsent';
 import { Logo, Spinner, ErrorState, EmptyState } from './components/UI';
 import PublicLayout from './components/PublicLayout';
@@ -50,6 +52,7 @@ const StudentDetail = lazy(() => import('./pages/admin/StudentDetail'));
 const AdminRequests = lazy(() => import('./pages/admin/Requests'));
 const AdminActivity = lazy(() => import('./pages/admin/Activity'));
 const AdminSettings = lazy(() => import('./pages/admin/Settings'));
+const AdminControlUsers = lazy(() => import('./pages/admin/ControlUsers'));
 const AdminAnalytics = lazy(() => import('./pages/admin/Analytics'));
 const PrivacyPolicy = lazy(() =>
   import('./pages/LegalPages').then((module) => ({ default: module.PrivacyPolicy })),
@@ -392,6 +395,7 @@ function AppRoutes() {
           <Route path="activity" element={<AdminActivity />} />
           <Route path="analytics" element={<AdminAnalytics />} />
           <Route path="settings" element={<AdminSettings />} />
+          <Route path="control-users" element={<AdminControlUsers />} />
         </Route>
         <Route
           path="*"
@@ -417,29 +421,36 @@ function AppRoutes() {
   );
 }
 
-function ModeApplication({ mode }) {
+function ModeApplication({ mode, whatsappNumber }) {
   const app = (
-    <ServicesProvider>
-      <ApiProgress />
-      <AppRoutes />
-    </ServicesProvider>
+    <SiteConfigProvider initialWhatsappNumber={whatsappNumber}>
+      <ServicesProvider>
+        <ApiProgress />
+        <AppRoutes />
+      </ServicesProvider>
+    </SiteConfigProvider>
   );
   return <LocalAuthProvider mode={mode}>{app}</LocalAuthProvider>;
 }
 
 function ClientRoot() {
-  const [mode, setMode] = useState(null);
+  const [appConfig, setAppConfig] = useState(null);
   const [error, setError] = useState('');
   function load() {
     setError('');
     api
       .get('/config')
-      .then(({ data }) => setMode(data.mode))
+      .then(({ data }) =>
+        setAppConfig({
+          mode: data.mode,
+          whatsappNumber: normalizeContactNumber(data.whatsappNumber) || WHATSAPP_NUMBER,
+        }),
+      )
       .catch(() => {
         // Keep the public landing page visible if the free service is waking up or
         // the config endpoint is temporarily unavailable. Production is always live mode.
         if (import.meta.env.PROD && window.location.pathname === '/') {
-          setMode('live');
+          setAppConfig({ mode: 'live', whatsappNumber: WHATSAPP_NUMBER });
           return;
         }
         setError('The application server is not available. Please try again in a moment.');
@@ -455,12 +466,12 @@ function ClientRoot() {
             <ErrorState message={error} onRetry={load} />
           </div>
         </div>
-      ) : !mode ? (
+      ) : !appConfig ? (
         <div className="flex min-h-screen items-center justify-center">
           <Spinner label="Getting things ready…" />
         </div>
       ) : (
-        <ModeApplication mode={mode} />
+        <ModeApplication mode={appConfig.mode} whatsappNumber={appConfig.whatsappNumber} />
       )}
       <CookieConsentExperience />
     </>

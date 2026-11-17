@@ -20,6 +20,7 @@ import { Logo, Avatar } from './UI';
 import WhatsAppButton from './WhatsAppButton';
 import NotificationPanel from './NotificationPanel';
 import { useAppAuth } from '../context/AuthContext';
+import { useSiteConfig } from '../context/SiteConfigContext';
 import { formatPhoneNumber, whatsappUrl } from '../lib/constants';
 import ThemeControl from './ThemeControl';
 import LegalLinks from './LegalLinks';
@@ -45,6 +46,7 @@ export default function StudentLayout() {
   const triggerRef = useRef(null);
   const drawerRef = useRef(null);
   const { user, logout, mode } = useAppAuth();
+  const { whatsappNumber } = useSiteConfig();
   const navigate = useNavigate();
   const closeDrawer = () => setOpen(false);
   useMobileDrawer(open, closeDrawer, drawerRef, triggerRef);
@@ -129,13 +131,13 @@ export default function StudentLayout() {
               Your next step could start with a simple conversation.
             </p>
             <a
-              href={whatsappUrl()}
+              href={whatsappUrl(whatsappNumber)}
               target="_blank"
               rel="noopener noreferrer"
               className="student-whatsapp-link flex min-h-11 items-center justify-between gap-2 rounded-lg border border-emerald-400/20 bg-emerald-500/10 px-3 text-[11px] font-semibold text-emerald-200"
-              aria-label={`Contact ErasePaper on WhatsApp at ${formatPhoneNumber()}`}
+              aria-label={`Contact ErasePaper on WhatsApp at ${formatPhoneNumber(whatsappNumber)}`}
             >
-              WhatsApp · {formatPhoneNumber()}
+              WhatsApp · {formatPhoneNumber(whatsappNumber)}
               <ArrowUpRight size={14} className="shrink-0" />
             </a>
           </div>

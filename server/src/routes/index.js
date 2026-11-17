@@ -9,6 +9,7 @@ import { createRequestController } from '../controllers/requestController.js';
 import { createAdminController } from '../controllers/adminController.js';
 import { createNotificationController } from '../controllers/notificationController.js';
 import { createAnalyticsController } from '../controllers/analyticsController.js';
+import { createSiteConfigController } from '../controllers/siteConfigController.js';
 import { upload } from '../services/uploads.js';
 
 export function createRoutes({ store, auth, deletion }) {
@@ -19,6 +20,7 @@ export function createRoutes({ store, auth, deletion }) {
   const admin = createAdminController(store, deletion);
   const notifications = createNotificationController(store);
   const analytics = createAnalyticsController(store);
+  const siteConfig = createSiteConfigController(store);
   const analyticsLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     limit: config.demo ? 1200 : 300,
@@ -78,9 +80,7 @@ export function createRoutes({ store, auth, deletion }) {
   router.get('/health', (req, res) =>
     res.json({ status: 'ok', mode: config.demo ? 'demo' : 'live', database: store.kind }),
   );
-  router.get('/config', (req, res) =>
-    res.json({ mode: config.demo ? 'demo' : 'live', whatsappNumber: config.whatsapp }),
-  );
+  router.get('/config', asyncHandler(siteConfig.publicConfig));
   router.post('/auth/register', authLimiter, asyncHandler(account.register));
   router.post('/auth/login', authLimiter, asyncHandler(account.login));
   router.post(
@@ -121,6 +121,8 @@ export function createRoutes({ store, auth, deletion }) {
   router.get('/notifications', asyncHandler(notifications.list));
   router.post('/notifications/read', asyncHandler(notifications.read));
   router.use('/admin', auth.requireAdmin);
+  router.get('/admin/control-users', asyncHandler(siteConfig.adminRead));
+  router.put('/admin/control-users', writeLimiter, asyncHandler(siteConfig.update));
   router.get('/admin/analytics', asyncHandler(analytics.report));
   router.get('/admin/overview', asyncHandler(admin.overview));
   router.get('/admin/students', asyncHandler(admin.students));

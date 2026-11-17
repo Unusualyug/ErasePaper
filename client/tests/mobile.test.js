@@ -1,6 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { formatPhoneNumber, phoneUrl, SUPPORT_EMAIL, whatsappUrl } from '../src/lib/constants.js';
+import {
+  formatPhoneNumber,
+  normalizeContactNumber,
+  phoneUrl,
+  SUPPORT_EMAIL,
+  whatsappUrl,
+} from '../src/lib/constants.js';
 
 test('support contact details format the business email and India mobile for call and WhatsApp', () => {
   assert.equal(SUPPORT_EMAIL, 'support@erasepaper.online');
@@ -15,4 +21,13 @@ test('support contact details format the business email and India mobile for cal
     whatsappUrl('+91 98257 51614', 'A student request #42'),
     'https://wa.me/919825751614?text=A%20student%20request%20%2342',
   );
+});
+
+test('contact number normalization accepts international formatting and rejects invalid values', () => {
+  assert.equal(normalizeContactNumber('+91 (98257) 51614'), '919825751614');
+  assert.equal(normalizeContactNumber('14155552671'), '14155552671');
+  assert.equal(normalizeContactNumber('12345'), '');
+  assert.equal(normalizeContactNumber('9825751614'), '');
+  assert.equal(normalizeContactNumber('+00 12345678'), '');
+  assert.equal(normalizeContactNumber('abc 98257 51614'), '');
 });

@@ -9,6 +9,7 @@ import { hashPassword, verifyPassword } from '../src/utils/passwords.js';
 import AnalyticsPageView from '../src/models/AnalyticsPageView.js';
 import AnalyticsSession from '../src/models/AnalyticsSession.js';
 import Service from '../src/models/Service.js';
+import SiteSetting from '../src/models/SiteSetting.js';
 import PasswordResetToken from '../src/models/PasswordResetToken.js';
 
 let replSet, connection, store;
@@ -49,6 +50,9 @@ test('local repository enforces username and email uniqueness, allows shared pho
   await store.services.seed();
   assert.equal(await Service.exists({ slug: 'bulk-printing', active: true }), null);
   assert.equal((await store.services.list()).length, 4);
+  await store.withTransaction(async (tx) => store.settings.set('publicWhatsappNumber', '14155552671', tx));
+  assert.equal(await store.settings.get('publicWhatsappNumber'), '14155552671');
+  assert.equal((await SiteSetting.findOne({ key: 'publicWhatsappNumber' }).lean()).value, '14155552671');
   const indexes = await connection.collection('local_users_v2').indexes();
   assert.ok(
     !indexes.some(

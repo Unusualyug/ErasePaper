@@ -6,6 +6,7 @@ import { seedDemo } from '../src/services/seedDemo.js';
 import { createApp } from '../src/app.js';
 import { publicRequest, publicUser } from '../src/utils/serializers.js';
 import { hashPassword, verifyPassword } from '../src/utils/passwords.js';
+import serverConfig from '../src/config/env.js';
 
 let store,
   app,
@@ -56,6 +57,52 @@ test('public configuration is explicitly demo, with the four active services', a
     services.body.services.some((service) => service.slug === 'bulk-printing'),
     false,
   );
+});
+test('public contact number changes are admin-only, confirmed by the API, and audit-log safely', async () => {
+  await request(app).get('/api/admin/control-users').expect(401);
+  await request(app).get('/api/admin/control-users').set('Cookie', studentCookie).expect(403);
+  await request(app)
+    .put('/api/admin/control-users')
+    .set('Cookie', studentCookie)
+    .send({ whatsappNumber: '+1 415 555 2671' })
+    .expect(403);
+
+  const current = await request(app).get('/api/admin/control-users').set('Cookie', adminCookie).expect(200);
+  assert.equal(current.body.whatsappNumber, serverConfig.whatsapp);
+  await request(app)
+    .put('/api/admin/control-users')
+    .set('Cookie', adminCookie)
+    .send({ whatsappNumber: '12345' })
+    .expect(400);
+  await request(app)
+    .put('/api/admin/control-users')
+    .set('Cookie', adminCookie)
+    .send({ whatsappNumber: '9825751614' })
+    .expect(400);
+  await request(app)
+    .put('/api/admin/control-users')
+    .set('Cookie', adminCookie)
+    .send({ whatsappNumber: '+1 (415) 555-2671' })
+    .expect(400);
+
+  const update = await request(app)
+    .put('/api/admin/control-users')
+    .set('Cookie', adminCookie)
+    .send({ whatsappNumber: '+1 (415) 555-2671', confirmed: true })
+    .expect(200);
+  assert.equal(update.body.whatsappNumber, '14155552671');
+  const publicConfig = await request(app).get('/api/config').expect(200);
+  assert.equal(publicConfig.body.whatsappNumber, '14155552671');
+
+  const auditEvents = store.data.logs.filter((item) => item.action === 'site.contact_number_updated');
+  assert.equal(auditEvents.length, 1);
+  assert.doesNotMatch(JSON.stringify(auditEvents), /14155552671/);
+  await request(app)
+    .put('/api/admin/control-users')
+    .set('Cookie', adminCookie)
+    .send({ whatsappNumber: '14155552671', confirmed: true })
+    .expect(200);
+  assert.equal(store.data.logs.filter((item) => item.action === 'site.contact_number_updated').length, 1);
 });
 test('retired-service history remains readable after the active catalog is seeded', async () => {
   const details = {

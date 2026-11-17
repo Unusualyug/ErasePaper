@@ -12,6 +12,7 @@ import {
 import { Modal, StatusBadge, ErrorState, Avatar } from './UI';
 import { WhatsAppIcon } from './WhatsAppButton';
 import { useToast } from '../context/ToastContext';
+import { useSiteConfig } from '../context/SiteConfigContext';
 import { FIELD_LABELS, formatDate, SUPPORT_EMAIL, whatsappUrl } from '../lib/constants';
 import api, { errorMessage, downloadAttachment } from '../lib/api';
 export default function RequestDetails({ request, onClose, admin = false, onUpdated }) {
@@ -22,6 +23,7 @@ export default function RequestDetails({ request, onClose, admin = false, onUpda
     [cancelConfirm, setCancelConfirm] = useState(false);
   const actionLock = useRef(false);
   const toast = useToast();
+  const { whatsappNumber } = useSiteConfig();
   useEffect(() => {
     setStatus(request?.status || 'Pending');
     setNotes(request?.adminNotes || '');
@@ -251,7 +253,7 @@ export default function RequestDetails({ request, onClose, admin = false, onUpda
                   )}
                   <a
                     href={whatsappUrl(
-                      undefined,
+                      whatsappNumber,
                       `Hello ErasePaper, I would like to discuss my request ${request.requestId}.`,
                     )}
                     target="_blank"
