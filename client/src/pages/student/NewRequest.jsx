@@ -156,11 +156,7 @@ export default function NewRequest() {
                 id="title"
                 name="title"
                 className="input"
-                placeholder={
-                  slug === 'bulk-printing'
-                    ? 'e.g. Semester 6 laboratory manuals'
-                    : 'Give your request a clear, short title'
-                }
+                placeholder="Give your request a clear, short title"
                 required
                 minLength={5}
                 maxLength={160}
@@ -196,7 +192,7 @@ export default function NewRequest() {
                       required={field.required}
                       value={details[field.key] || ''}
                       maxLength={1500}
-                      placeholder="Include your full delivery address and PIN code"
+                      placeholder="Add any relevant details"
                       onChange={(e) => setDetails((d) => ({ ...d, [field.key]: e.target.value }))}
                     />
                   ) : (
@@ -330,9 +326,8 @@ export default function NewRequest() {
                 className="mt-1 h-4 w-4 shrink-0 accent-brand-600"
               />
               <span className="text-[11px] leading-6 text-navy-700">
-                I understand that research and project services provide mentoring, editing, and documentation
-                support. I remain responsible for my own assessed work. Printing services cover document
-                preparation and printing.
+                I understand that our services provide academic guidance, mentoring, editing, and
+                documentation support. I remain responsible for my own assessed work.
               </span>
             </label>
             {busy && files.length > 0 && (

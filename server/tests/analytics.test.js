@@ -184,6 +184,20 @@ test('all visits get anonymous page totals while visitor analytics requires cons
   assert.ok(store.data.analyticsVisitors[0].visitorKey !== visitorId);
 });
 
+test('historical page-view aggregates for retired services remain reportable', async () => {
+  const now = new Date();
+  await store.analytics.aggregatePageView({
+    pageKey: 'bulk-printing',
+    dayKey: dateKeyInIndia(now),
+    retentionAt: new Date(now.getTime() + 400 * 24 * 60 * 60 * 1000),
+  });
+  const report = await request(app)
+    .get('/api/admin/analytics?range=today')
+    .set('Cookie', adminCookie)
+    .expect(200);
+  assert.equal(report.body.popularPages.find((page) => page.key === 'bulk-printing')?.pageViews, 1);
+});
+
 test('withdrawal deletes linked identifiers while anonymous page totals continue without visitor IDs', async () => {
   const id = '89913811-7071-420f-86ed-f8dc9c918736';
   const tab = '3ec79531-5f90-4355-927c-68a6b35ad872';

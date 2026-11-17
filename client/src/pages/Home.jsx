@@ -12,7 +12,6 @@ import {
   Minus,
   FileCheck2,
   Layers3,
-  Truck,
   Compass,
   UserRoundPlus,
   Send,
@@ -37,7 +36,7 @@ import { WhatsAppIcon } from '../components/WhatsAppButton';
 const faqs = [
   [
     'What is ErasePaper?',
-    'ErasePaper brings five academic support services together in one place: literature review guidance, research paper support, survey papers, bulk printing with manual creation, and final-year project mentoring. Create an account, tell us what you need, and follow your request from your dashboard.',
+    'ErasePaper brings four academic support services together in one place: literature review guidance, research paper support, survey papers, and final-year project mentoring. Create an account, tell us what you need, and follow your request from your dashboard.',
   ],
   [
     'Do you complete assignments or assessed work for students?',
@@ -46,10 +45,6 @@ const faqs = [
   [
     'How do I get started?',
     `Create an account with an email, username, mobile number, and password. Email and phone are not verified. When live email delivery is configured, we send a welcome email and a receipt when you submit a service request; no email-verification message, OTP, or SMS is sent. The demo sends no emails. Then submit a short service request or contact us on WhatsApp, email ${SUPPORT_EMAIL}, or call ${formatPhoneNumber()} to discuss your requirements.`,
-  ],
-  [
-    'Is manual creation really included with bulk printing?',
-    'Yes. Manual creation is included at no additional charge with our bulk printing service. Printing, binding, and delivery costs depend on your requirements and are confirmed in your quotation before you proceed.',
   ],
   [
     'Can I track my request after submitting it?',
@@ -91,7 +86,7 @@ function ServiceCard({ service, index, user }) {
             to={user ? `/requests/new?service=${service.slug}` : `/sign-up?service=${service.slug}`}
             className="service-card-link flex items-center gap-2 text-xs font-semibold text-brand-600"
           >
-            {service.slug === 'bulk-printing' ? 'Get a printing quote' : 'Explore this service'}
+            Explore this service
             <ArrowRight size={15} className="service-arrow" />
           </Link>
           <a
@@ -144,7 +139,7 @@ export default function Home() {
               </span>
             </h1>
             <p className="mt-5 max-w-[435px] text-[14px] leading-[1.8] text-slate-500 sm:mt-8 sm:leading-[1.95]">
-              From research papers and survey papers to final-year project guidance and doorstep printing,
+              From research papers and survey papers to literature review and final-year project guidance,
               ErasePaper brings essential academic services together in one place.
             </p>
             <div className="hero-actions mt-6 flex flex-wrap gap-3 sm:mt-8">
@@ -202,7 +197,7 @@ export default function Home() {
                 <Check size={19} />
               </span>
               <div>
-                <p className="text-[11px] font-bold">5 services. One place.</p>
+                <p className="text-[11px] font-bold">4 services. One place.</p>
                 <p className="mt-0.5 text-[9px] text-slate-400">Less running around. More progress.</p>
               </div>
             </div>
@@ -223,7 +218,7 @@ export default function Home() {
             [Compass, 'Find your direction'],
             [FileCheck2, 'Strengthen your work'],
             [Layers3, 'Organise your research'],
-            [Truck, 'Get it delivered'],
+            [BadgeCheck, 'Track your progress'],
           ].map(([Icon, text]) => (
             <span key={text} className="flex items-center gap-2.5 text-[12px] font-semibold text-navy-500">
               <Icon size={21} strokeWidth={1.5} className="text-slate-400" />
@@ -244,7 +239,7 @@ export default function Home() {
               </h2>
             </div>
             <p className="max-w-[340px] text-[13px] leading-7 text-slate-500">
-              Five focused services to help you learn, create, and move forward—with clarity and confidence.
+              Four focused services to help you learn, create, and move forward—with clarity and confidence.
             </p>
           </Reveal>
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -365,7 +360,7 @@ export default function Home() {
                 [
                   Layers3,
                   'Everything, together',
-                  'Research, project guidance, and printing in one simple workspace.',
+                  'Research, writing, and project guidance in one simple workspace.',
                 ],
                 [
                   FileCheck2,

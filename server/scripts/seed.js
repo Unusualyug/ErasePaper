@@ -6,7 +6,7 @@ try {
     const store = await connectStore();
     await store.services.seed();
     console.log(
-      'Five academic services seeded. No fictitious users or requests were added to the live database.',
+      'Active academic services seeded. No fictitious users or requests were added to the live database.',
     );
   } else {
     console.log(

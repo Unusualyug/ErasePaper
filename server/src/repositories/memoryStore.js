@@ -233,6 +233,8 @@ export function createMemoryStore() {
         return clone(data.services.filter((s) => s.active));
       },
       async seed() {
+        for (const existing of data.services)
+          if (!SERVICES.some((service) => service.slug === existing.slug)) existing.active = false;
         for (const service of SERVICES)
           if (!data.services.some((s) => s.slug === service.slug))
             data.services.push({ ...clone(service), _id: service.slug, active: true });

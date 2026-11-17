@@ -47,11 +47,70 @@ before(async () => {
 });
 after(() => deletion.stop());
 
-test('public configuration is explicitly demo, with all five services', async () => {
+test('public configuration is explicitly demo, with the four active services', async () => {
   const config = await request(app).get('/api/config').expect(200);
   assert.equal(config.body.mode, 'demo');
   const services = await request(app).get('/api/services').expect(200);
-  assert.equal(services.body.services.length, 5);
+  assert.equal(services.body.services.length, 4);
+  assert.equal(
+    services.body.services.some((service) => service.slug === 'bulk-printing'),
+    false,
+  );
+});
+test('retired-service history remains readable after the active catalog is seeded', async () => {
+  const details = {
+    copies: 20,
+    pageCount: 80,
+    printType: 'Color',
+    binding: 'Spiral',
+    deliveryAddress: 'Historic address, Ahmedabad',
+  };
+  store.data.services.push({
+    _id: 'bulk-printing',
+    slug: 'bulk-printing',
+    name: 'Bulk Printing & Delivery',
+    active: true,
+  });
+  const historicalRequest = await store.requests.create({
+    userId: String(student._id),
+    serviceSlug: 'bulk-printing',
+    serviceType: 'Bulk Printing & Delivery',
+    title: 'Previously accepted printing request',
+    description: 'This completed request must remain available in the student history.',
+    details,
+    status: 'Completed',
+  });
+
+  await store.services.seed();
+  assert.equal(store.data.services.find((service) => service.slug === 'bulk-printing').active, false);
+  assert.equal((await store.services.list()).length, 4);
+
+  const studentView = await request(app)
+    .get(`/api/requests/${historicalRequest._id}`)
+    .set('Cookie', studentCookie)
+    .expect(200);
+  assert.equal(studentView.body.request.serviceType, 'Bulk Printing & Delivery');
+  assert.deepEqual(studentView.body.request.details, details);
+
+  const adminView = await request(app)
+    .get('/api/admin/requests?service=bulk-printing')
+    .set('Cookie', adminCookie)
+    .expect(200);
+  assert.equal(adminView.body.total, 1);
+  assert.equal(adminView.body.items[0].requestId, historicalRequest.requestId);
+});
+test('retired Bulk Printing is unavailable for new service requests', async () => {
+  await request(app)
+    .post('/api/requests')
+    .set('Cookie', studentCookie)
+    .send({
+      serviceSlug: 'bulk-printing',
+      title: 'Legacy printing request',
+      description: 'This service is no longer available for new requests.',
+      details: {},
+      integrityAcknowledged: true,
+    })
+    .expect(400);
 });
 test('public demo access is student-only and rejects an Admin persona selector', async () => {
   await request(app).post('/api/auth/demo/quick').send({ persona: 'admin' }).expect(400);

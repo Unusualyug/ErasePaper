@@ -1,10 +1,9 @@
-import { BookOpen, FileText, ChartNoAxesCombined, Printer, GraduationCap } from 'lucide-react';
-export const SERVICE_ICONS = { BookOpen, FileText, ChartNoAxesCombined, Printer, GraduationCap };
+import { BookOpen, FileText, ChartNoAxesCombined, GraduationCap } from 'lucide-react';
+export const SERVICE_ICONS = { BookOpen, FileText, ChartNoAxesCombined, GraduationCap };
 export const SERVICE_COLORS = {
   purple: 'bg-brand-50 text-brand-600',
   blue: 'bg-blue-50 text-blue-600',
   teal: 'bg-teal-50 text-teal-600',
-  orange: 'bg-orange-50 text-orange-600',
   indigo: 'bg-indigo-50 text-indigo-600',
 };
 export const WHATSAPP_NUMBER = import.meta.env?.VITE_WHATSAPP_NUMBER || '919825751614';

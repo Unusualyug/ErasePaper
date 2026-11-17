@@ -23,7 +23,6 @@ const servicePages = {
   'research-paper': ['research-paper', 'Research Paper service'],
   'survey-paper': ['survey-paper', 'Survey Paper service'],
   'final-year-project': ['final-year-project', 'Final-Year Project service'],
-  'bulk-printing': ['bulk-printing', 'Bulk Printing service'],
 };
 
 export const hashAnalyticsId = (value) => createHash('sha256').update(value).digest('hex');

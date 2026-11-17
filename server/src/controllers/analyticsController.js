@@ -1,13 +1,7 @@
 import { z } from 'zod';
 import { createAnalyticsService, getAnalyticsRange } from '../services/analytics.js';
 
-const serviceSlugs = [
-  'literature-review',
-  'research-paper',
-  'survey-paper',
-  'final-year-project',
-  'bulk-printing',
-];
+const serviceSlugs = ['literature-review', 'research-paper', 'survey-paper', 'final-year-project'];
 const source = z.enum(['direct', 'search', 'social', 'referral', 'unknown']).default('unknown');
 const collectionSchema = z
   .object({

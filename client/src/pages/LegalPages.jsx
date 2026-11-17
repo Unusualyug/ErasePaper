@@ -48,7 +48,7 @@ export function PrivacyPolicy() {
     <LegalPage
       eyebrow="Privacy"
       title="Privacy policy"
-      intro="This page explains the information ErasePaper processes to provide academic mentoring, editing, documentation, printing and delivery services. Use the contact details below to ask a question or request access, correction or deletion."
+      intro="This page explains the information ErasePaper processes to provide academic mentoring, research, editing, documentation and project-support services. Use the contact details below to ask a question or request access, correction or deletion."
     >
       <Section title="Information we process">
         <p>
@@ -71,8 +71,8 @@ export function PrivacyPolicy() {
       <Section title="How we use information">
         <p>
           We use this information to authenticate your account, review and respond to service requests,
-          communicate about requirements and progress, arrange quotations for printing or delivery, provide
-          support, protect accounts and maintain operational records.
+          communicate about requirements and progress, discuss service scope and timelines, provide support,
+          protect accounts and maintain operational records.
         </p>
         <p>
           ErasePaper provides academic guidance, mentoring, editing and documentation support; students remain
@@ -248,18 +248,17 @@ export function TermsAndConditions() {
     >
       <Section title="Services and academic integrity">
         <p>
-          ErasePaper offers literature review, research paper and survey paper guidance; bulk printing and
-          manual creation; and final-year project mentoring and documentation support. Services are
-          assistance, mentoring, editing and documentation—not completing assessed work on a student's behalf.
-          Students are responsible for their research, implementation, learning and final submissions.
+          ErasePaper offers literature review, research paper and survey paper guidance, plus final-year
+          project mentoring and documentation support. Services are assistance, mentoring, editing and
+          documentation—not completing assessed work on a student's behalf. Students are responsible for their
+          research, implementation, learning and final submissions.
         </p>
       </Section>
-      <Section title="Requests, estimates and delivery">
+      <Section title="Service requests and estimates">
         <p>
           A submitted request records requirements for review and does not by itself constitute an accepted
-          quotation. Manual creation is included without an additional manual-creation fee with the
-          bulk-printing service; printing, binding and delivery costs are confirmed separately based on the
-          request. No online payment or automated courier integration is currently provided.
+          quotation or commitment. The service scope, availability, fees and timelines are confirmed with you
+          before work begins. No online payment integration is currently provided.
         </p>
       </Section>
       <Section title="Accounts and appropriate use">

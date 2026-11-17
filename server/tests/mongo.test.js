@@ -8,6 +8,7 @@ import { dateKeyInIndia, getAnalyticsRange } from '../src/services/analytics.js'
 import { hashPassword, verifyPassword } from '../src/utils/passwords.js';
 import AnalyticsPageView from '../src/models/AnalyticsPageView.js';
 import AnalyticsSession from '../src/models/AnalyticsSession.js';
+import Service from '../src/models/Service.js';
 import PasswordResetToken from '../src/models/PasswordResetToken.js';
 
 let replSet, connection, store;
@@ -43,7 +44,11 @@ async function newUser(username, phoneNumber, extra = {}) {
 }
 
 test('local repository enforces username and email uniqueness, allows shared phones, and isolates fresh accounts', async () => {
-  assert.equal((await store.services.list()).length, 5);
+  assert.equal((await store.services.list()).length, 4);
+  await Service.create({ slug: 'bulk-printing', name: 'Retired service', active: true });
+  await store.services.seed();
+  assert.equal(await Service.exists({ slug: 'bulk-printing', active: true }), null);
+  assert.equal((await store.services.list()).length, 4);
   const indexes = await connection.collection('local_users_v2').indexes();
   assert.ok(
     !indexes.some(
@@ -288,7 +293,7 @@ test('dashboard and student summary use database aggregation', async () => {
   assert.equal(summary.total, 1);
   assert.equal(summary.completed, 1);
   const dashboard = await store.dashboard();
-  assert.equal(dashboard.services.length, 5);
+  assert.equal(dashboard.services.length, 4);
   assert.equal(dashboard.months.length, 6);
   assert.ok(dashboard.students >= 1);
   const search = await store.users.list({ search: 'mongo_user', page: 1, limit: 1 });

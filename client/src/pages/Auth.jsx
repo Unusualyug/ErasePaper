@@ -124,7 +124,7 @@ function AuthScreen({ intent = 'signin' }) {
           </p>
           <ul className="mt-10 space-y-5">
             {[
-              'Five focused academic services',
+              'Four focused academic services',
               'Private password-protected account',
               'Progress you can follow, support you can reach',
             ].map((text) => (

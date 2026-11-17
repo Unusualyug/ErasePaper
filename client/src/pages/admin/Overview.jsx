@@ -174,7 +174,7 @@ export default function Overview() {
             'Total requests',
             stats.requests,
             'text-blue-300',
-            'Across all five services',
+            'Across available services',
             '/admin/requests',
           ],
           [

@@ -295,6 +295,10 @@ export function createMongoStore(connection) {
             updateOne: { filter: { slug: s.slug }, update: { $set: { ...s, active: true } }, upsert: true },
           })),
         );
+        await Service.updateMany(
+          { slug: { $nin: SERVICES.map((service) => service.slug) } },
+          { $set: { active: false } },
+        );
       },
     },
     notifications: {

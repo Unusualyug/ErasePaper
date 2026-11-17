@@ -155,7 +155,7 @@ export default function Dashboard() {
           <section id="available-services">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-base font-bold">What are you working on?</h2>
-              <span className="text-[10px] text-slate-400">5 ways we can help</span>
+              <span className="text-[10px] text-slate-400">4 ways we can help</span>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               {services.map((service) => {
@@ -171,11 +171,7 @@ export default function Dashboard() {
                     </span>
                     <div className="min-w-0 flex-1">
                       <h3 className="text-xs font-semibold">{service.shortName}</h3>
-                      <p className="mt-1 text-[10px] text-slate-400">
-                        {service.slug === 'bulk-printing'
-                          ? 'Print, bind & deliver'
-                          : 'Guidance for your next step'}
-                      </p>
+                      <p className="mt-1 text-[10px] text-slate-400">Guidance for your next step</p>
                     </div>
                     <ArrowUpRight size={15} className="text-slate-300 group-hover:text-brand-600" />
                   </Link>
