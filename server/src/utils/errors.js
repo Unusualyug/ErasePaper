@@ -15,10 +15,18 @@ export function errorHandler(error, req, res, next) {
     });
   if (error.code === 11000)
     return res.status(409).json({ error: 'This record already exists.', code: 'CONFLICT' });
-  if (error.code === 'LIMIT_FILE_SIZE')
-    return res
-      .status(400)
-      .json({ error: 'Each attachment must be 10 MB or smaller.', code: 'FILE_TOO_LARGE' });
+  if (error.name === 'MulterError') {
+    const isTeamPhoto = /(?:^|\/)admin\/team(?:\/|$)/.test(req.path);
+    const message =
+      error.code === 'LIMIT_FILE_SIZE'
+        ? isTeamPhoto
+          ? 'Team photos must be 5 MB or smaller.'
+          : 'Each attachment must be 10 MB or smaller.'
+        : isTeamPhoto
+          ? 'Upload one JPG, PNG, or WebP team photo.'
+          : 'Upload up to three supported attachments.';
+    return res.status(400).json({ error: message, code: error.code || 'INVALID_FILE' });
+  }
   const status = error.status || 500;
   if (status >= 500)
     console.error(

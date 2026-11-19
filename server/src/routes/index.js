@@ -10,7 +10,9 @@ import { createAdminController } from '../controllers/adminController.js';
 import { createNotificationController } from '../controllers/notificationController.js';
 import { createAnalyticsController } from '../controllers/analyticsController.js';
 import { createSiteConfigController } from '../controllers/siteConfigController.js';
+import { createTeamController } from '../controllers/teamController.js';
 import { upload } from '../services/uploads.js';
+import { teamPhotoUpload } from '../services/teamPhotos.js';
 
 export function createRoutes({ store, auth, deletion }) {
   const router = Router();
@@ -21,6 +23,7 @@ export function createRoutes({ store, auth, deletion }) {
   const notifications = createNotificationController(store);
   const analytics = createAnalyticsController(store);
   const siteConfig = createSiteConfigController(store);
+  const team = createTeamController(store);
   const analyticsLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     limit: config.demo ? 1200 : 300,
@@ -94,6 +97,8 @@ export function createRoutes({ store, auth, deletion }) {
   if (config.demo) router.post('/auth/demo/quick', asyncHandler(account.quickDemo));
 
   router.get('/services', asyncHandler(requests.services));
+  router.get('/team', asyncHandler(team.publicList));
+  router.get('/team/:id/photo', asyncHandler(team.photo));
   router.post(
     '/analytics/heartbeat',
     analyticsLimiter,
@@ -121,6 +126,10 @@ export function createRoutes({ store, auth, deletion }) {
   router.get('/notifications', asyncHandler(notifications.list));
   router.post('/notifications/read', asyncHandler(notifications.read));
   router.use('/admin', auth.requireAdmin);
+  router.get('/admin/team', asyncHandler(team.adminList));
+  router.post('/admin/team', writeLimiter, teamPhotoUpload.single('photo'), asyncHandler(team.create));
+  router.patch('/admin/team/:id', writeLimiter, teamPhotoUpload.single('photo'), asyncHandler(team.update));
+  router.delete('/admin/team/:id', writeLimiter, asyncHandler(team.remove));
   router.get('/admin/control-users', asyncHandler(siteConfig.adminRead));
   router.put('/admin/control-users', writeLimiter, asyncHandler(siteConfig.update));
   router.get('/admin/analytics', asyncHandler(analytics.report));

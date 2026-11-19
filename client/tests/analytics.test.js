@@ -14,8 +14,10 @@ test('analytics helpers collapse dynamic paths and keep only approved service/an
   assert.equal(normalizedAnalyticsPath('/requests/EP-2026-ABCD?secret=1'), '/requests/:id');
   assert.equal(normalizedAnalyticsPath('/admin/students/legacy-account-id'), '/admin/students/:id');
   assert.equal(serviceSlugFromSearch('?service=research-paper'), 'research-paper');
+  assert.equal(serviceSlugFromSearch('?service=social-media-marketing'), 'social-media-marketing');
   assert.equal(serviceSlugFromSearch('?service=unknown&email=private@example.com'), undefined);
   assert.equal(safeAnalyticsHash('#services'), '#services');
+  assert.equal(safeAnalyticsHash('#team'), '#team');
   assert.equal(safeAnalyticsHash('#reset-password?token=private'), '');
 });
 

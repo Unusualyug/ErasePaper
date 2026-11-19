@@ -17,12 +17,14 @@ import {
   Send,
   BadgeCheck,
   BookOpenCheck,
+  UsersRound,
   Mail,
   Phone,
 } from 'lucide-react';
 import { useServices } from '../context/ServicesContext';
 import { useAppAuth } from '../context/AuthContext';
 import { useSiteConfig } from '../context/SiteConfigContext';
+import { useApi } from '../hooks/useApi';
 import {
   SERVICE_ICONS,
   SERVICE_COLORS,
@@ -37,7 +39,7 @@ import { WhatsAppIcon } from '../components/WhatsAppButton';
 const faqs = [
   [
     'What is ErasePaper?',
-    'ErasePaper brings four academic support services together in one place: literature review guidance, research paper support, survey papers, and final-year project mentoring. Create an account, tell us what you need, and follow your request from your dashboard.',
+    'ErasePaper supports students with literature review guidance, research papers, survey papers and final-year projects, and helps businesses manage their Instagram presence with analysis, content, strategy and reporting. Create an account, send a request and follow it from your dashboard.',
   ],
   [
     'Do you complete assignments or assessed work for students?',
@@ -49,7 +51,7 @@ const faqs = [
   ],
   [
     'Can I track my request after submitting it?',
-    'Absolutely. Your student dashboard shows each request with a unique request ID and its current status: Pending, In Progress, Completed, or Cancelled. You will also receive an in-dashboard notification when the administrator updates your status.',
+    'Absolutely. Your dashboard shows each request with a unique request ID and its current status: Pending, In Progress, Completed, or Cancelled. You will also receive an in-dashboard notification when the administrator updates your status.',
   ],
   [
     'Is my personal information secure?',
@@ -107,8 +109,30 @@ function ServiceCard({ service, index, user, whatsappNumber }) {
     </Reveal>
   );
 }
+
+function TeamPhoto({ member }) {
+  const [failed, setFailed] = useState(false);
+  return failed ? (
+    <div className="flex aspect-[4/5] items-center justify-center bg-brand-50 text-brand-300">
+      <UsersRound size={42} strokeWidth={1.25} aria-hidden="true" />
+      <span className="sr-only">Photo unavailable for {member.name}</span>
+    </div>
+  ) : (
+    <img
+      src={member.photoUrl}
+      alt={`Photo of ${member.name}`}
+      loading="lazy"
+      decoding="async"
+      onError={() => setFailed(true)}
+      className="aspect-[4/5] w-full object-cover"
+    />
+  );
+}
+
 export default function Home() {
   const services = useServices();
+  const { data: teamData, loading: teamLoading, error: teamError } = useApi('/team');
+  const teamMembers = teamData?.members || [];
   const { user } = useAppAuth();
   const { whatsappNumber } = useSiteConfig();
   const [faq, setFaq] = useState(0);
@@ -144,8 +168,8 @@ export default function Home() {
               </span>
             </h1>
             <p className="mt-5 max-w-[435px] text-[14px] leading-[1.8] text-slate-500 sm:mt-8 sm:leading-[1.95]">
-              From research papers and survey papers to literature review and final-year project guidance,
-              ErasePaper brings essential academic services together in one place.
+              From research papers, literature reviews and project mentoring to Instagram content, account
+              management and performance reporting, ErasePaper brings academic and business support together.
             </p>
             <div className="hero-actions mt-6 flex flex-wrap gap-3 sm:mt-8">
               <a href="#services" className="btn-primary">
@@ -207,7 +231,7 @@ export default function Home() {
                 <Check size={19} />
               </span>
               <div>
-                <p className="text-[11px] font-bold">4 services. One place.</p>
+                <p className="text-[11px] font-bold">5 services. One place.</p>
                 <p className="mt-0.5 text-[9px] text-slate-400">Less running around. More progress.</p>
               </div>
             </div>
@@ -220,9 +244,9 @@ export default function Home() {
       <section className="border-y border-slate-100 bg-[#fafbfe]">
         <div className="container-site grid grid-cols-2 items-start gap-x-4 gap-y-5 py-6 sm:flex sm:flex-wrap sm:items-center sm:justify-between sm:gap-6 sm:py-7">
           <p className="col-span-2 text-[11px] font-medium leading-5 text-slate-400 sm:col-span-1">
-            Made for the moments
+            Made for the work
             <br />
-            <span className="font-semibold text-navy-700">that matter in your education.</span>
+            <span className="font-semibold text-navy-700">that moves you forward.</span>
           </p>
           {[
             [Compass, 'Find your direction'],
@@ -252,7 +276,8 @@ export default function Home() {
               </h2>
             </div>
             <p className="max-w-[340px] text-[13px] leading-7 text-slate-500">
-              Four focused services to help you learn, create, and move forward—with clarity and confidence.
+              Academic guidance and Instagram-focused support to help students learn and businesses strengthen
+              their online presence.
             </p>
           </Reveal>
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -365,7 +390,8 @@ export default function Home() {
               <br />A smoother way forward.
             </h2>
             <p className="mt-5 max-w-md text-[13px] leading-7 text-slate-500">
-              College is challenging enough. Getting academic support shouldn’t be.
+              Whether you’re studying or running a business, getting the right support shouldn’t be
+              complicated.
             </p>
             <div className="mt-8 grid gap-6 sm:grid-cols-2">
               {[
@@ -382,7 +408,7 @@ export default function Home() {
                 [
                   Layers3,
                   'Everything, together',
-                  'Research, writing, and project guidance in one simple workspace.',
+                  'Research, writing, project mentoring and Instagram-focused business support in one workspace.',
                 ],
                 [
                   FileCheck2,
@@ -398,6 +424,60 @@ export default function Home() {
               ))}
             </div>
           </Reveal>
+        </div>
+      </section>
+      <section
+        id="team"
+        aria-labelledby="team-heading"
+        className="border-y border-slate-100 bg-[#f8f9fc] py-14 sm:py-20 lg:py-24"
+      >
+        <div className="container-site">
+          <Reveal className="mb-10 max-w-2xl">
+            <p className="eyebrow mb-3">Our Team</p>
+            <h2 id="team-heading" className="section-title">
+              The people behind ErasePaper.
+            </h2>
+            <p className="mt-4 text-[13px] leading-7 text-slate-500">
+              Meet the people who bring thoughtful academic and business support to life.
+            </p>
+          </Reveal>
+          {teamLoading && !teamData ? (
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4" aria-busy="true">
+              {Array.from({ length: 4 }, (_, index) => (
+                <div key={index} className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+                  <div className="skeleton-block aspect-[4/5] rounded-none" />
+                  <div className="p-4">
+                    <div className="skeleton-block h-4 w-2/3" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : teamError ? (
+            <p className="rounded-xl border border-slate-200 bg-white p-6 text-sm text-slate-500">
+              Our team profiles are unavailable right now. Please try again later.
+            </p>
+          ) : teamMembers.length ? (
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {teamMembers.map((member, index) => (
+                <Reveal key={member.id} delay={(index % 4) * 0.05}>
+                  <article className="overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-soft">
+                    <TeamPhoto key={member.photoUrl} member={member} />
+                    <div className="p-4">
+                      <h3 className="text-sm font-semibold text-navy-800">{member.name}</h3>
+                    </div>
+                  </article>
+                </Reveal>
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-xl border border-dashed border-brand-200 bg-white px-6 py-10 text-center">
+              <UsersRound size={30} className="mx-auto text-brand-400" strokeWidth={1.4} aria-hidden="true" />
+              <p className="mt-3 text-sm font-semibold text-navy-700">Team profiles coming soon</p>
+              <p className="mx-auto mt-2 max-w-md text-xs leading-6 text-slate-500">
+                Our team names and photos will appear here once they have been added.
+              </p>
+            </div>
+          )}
         </div>
       </section>
       <section id="how-it-works" className="border-y border-slate-100 bg-[#fafbfe] py-14 sm:py-20">
@@ -422,7 +502,7 @@ export default function Home() {
               [
                 BadgeCheck,
                 'Follow your progress',
-                'Track your request, connect with us, and take your next academic step with confidence.',
+                'Track your request, connect with us, and move your work forward with confidence.',
               ],
             ].map(([Icon, title, text], i) => (
               <Reveal key={title} delay={i * 0.1} className="relative text-center">

@@ -29,6 +29,7 @@ const periodOptions = [
 const pageLabels = {
   home: 'Homepage',
   services: 'Services section',
+  team: 'Our Team',
   'how-it-works': 'How it works',
   'why-us': 'Why ErasePaper',
   faqs: 'FAQs',
@@ -53,6 +54,7 @@ const pageLabels = {
   'research-paper': 'Research Paper service',
   'survey-paper': 'Survey Paper service',
   'final-year-project': 'Final-Year Project service',
+  'social-media-marketing': 'Social Media Marketing service',
   'bulk-printing': 'Bulk Printing service',
   other: 'Other pages',
 };

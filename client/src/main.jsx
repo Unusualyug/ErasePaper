@@ -54,6 +54,7 @@ const AdminActivity = lazy(() => import('./pages/admin/Activity'));
 const AdminSettings = lazy(() => import('./pages/admin/Settings'));
 const AdminControlUsers = lazy(() => import('./pages/admin/ControlUsers'));
 const AdminAnalytics = lazy(() => import('./pages/admin/Analytics'));
+const AdminTeamMembers = lazy(() => import('./pages/admin/TeamMembers'));
 const PrivacyPolicy = lazy(() =>
   import('./pages/LegalPages').then((module) => ({ default: module.PrivacyPolicy })),
 );
@@ -278,7 +279,7 @@ function Protected({ admin = false, children }) {
           action={
             <div className="flex flex-wrap justify-center gap-3">
               <Link className="btn-primary" to="/dashboard">
-                Go to student dashboard
+                Go to your dashboard
               </Link>
               <Link className="btn-secondary" to="/">
                 Return home
@@ -396,6 +397,7 @@ function AppRoutes() {
           <Route path="analytics" element={<AdminAnalytics />} />
           <Route path="settings" element={<AdminSettings />} />
           <Route path="control-users" element={<AdminControlUsers />} />
+          <Route path="team" element={<AdminTeamMembers />} />
         </Route>
         <Route
           path="*"

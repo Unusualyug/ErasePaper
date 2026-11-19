@@ -1,7 +1,13 @@
 const VISITOR_KEY = 'ep.analytics.visitor.v1';
 const SESSION_KEY = 'ep.analytics.session.v1';
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-const SERVICE_SLUGS = new Set(['literature-review', 'research-paper', 'survey-paper', 'final-year-project']);
+const SERVICE_SLUGS = new Set([
+  'literature-review',
+  'research-paper',
+  'survey-paper',
+  'final-year-project',
+  'social-media-marketing',
+]);
 
 function createId() {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') return crypto.randomUUID();
@@ -87,7 +93,7 @@ export function normalizedAnalyticsPath(pathname = '/') {
 
 export function safeAnalyticsHash(hash = '') {
   const value = String(hash).replace(/^#/, '').toLowerCase();
-  return ['services', 'how-it-works', 'why-us', 'faqs'].includes(value) ? `#${value}` : '';
+  return ['services', 'team', 'how-it-works', 'why-us', 'faqs'].includes(value) ? `#${value}` : '';
 }
 
 export function serviceSlugFromSearch(search = '') {

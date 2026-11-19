@@ -50,7 +50,7 @@ export function PrivacyPolicy() {
     <LegalPage
       eyebrow="Privacy"
       title="Privacy policy"
-      intro="This page explains the information ErasePaper processes to provide academic mentoring, research, editing, documentation and project-support services. Use the contact details below to ask a question or request access, correction or deletion."
+      intro="This page explains the information ErasePaper processes to provide academic guidance and social-media management and digital marketing services. Use the contact details below to ask a question or request access, correction or deletion."
     >
       <Section title="Information we process">
         <p>
@@ -61,7 +61,9 @@ export function PrivacyPolicy() {
           submitted; these are not verification messages. No email-verification code, OTP or SMS is sent, and
           the demo sends no emails. We also process profile details, service selections, request titles and
           descriptions, service-specific requirements, status history, messages you send to us and files you
-          choose to upload.
+          choose to upload. For social-media requests, those requirements may include business details, an
+          Instagram profile, target audience and marketing goals. Never submit account passwords or
+          verification codes.
         </p>
         <p>
           Administrators may add private operational notes to a request. Security and audit records may
@@ -78,7 +80,9 @@ export function PrivacyPolicy() {
         </p>
         <p>
           ErasePaper provides academic guidance, mentoring, editing and documentation support; students remain
-          responsible for their own assessed work and submissions.
+          responsible for their own assessed work and submissions. For business requests, information is used
+          to discuss Instagram content, account management, promotion and reporting within the agreed scope.
+          No particular reach, engagement, follower, lead or sales result is promised.
         </p>
       </Section>
       <Section title="Service providers and storage">
@@ -86,12 +90,15 @@ export function PrivacyPolicy() {
           ErasePaper manages email-and-password authentication and server-side sessions. When enabled in the
           live deployment, transactional email is delivered through Resend's HTTPS API using a sending domain
           configured by the operator. Welcome messages contain the account name; request receipts contain the
-          request ID and service name; an operational alert sent to ErasePaper support contains the student's
-          username, email address, request ID and service name. Resend processes these messages to deliver
-          them under its own terms and privacy policy. Student profiles, service requests, notifications and
-          application records are stored in MongoDB; the live deployment is intended to use MongoDB Atlas.
-          Uploaded files are held in private application storage configured by the operator. The exact
-          hosting, storage region and retention settings depend on the deployment selected by ErasePaper.
+          request ID and service name; an operational alert sent to ErasePaper support contains the
+          requester's username, email address, request ID and service name. Resend processes these messages to
+          deliver them under its own terms and privacy policy. User profiles, service requests, notifications
+          and application records are stored in MongoDB; the live deployment is intended to use MongoDB Atlas.
+          Uploaded files are held in application storage configured by the operator. Request attachments
+          remain private and require an authorized account to download. Team photos added by administrators
+          are intentionally displayed publicly on the homepage and are served only through the team-profile
+          image endpoint. The exact hosting, storage region and retention settings depend on the deployment
+          selected by ErasePaper.
         </p>
         <p>
           If you choose to contact us through WhatsApp, that conversation is handled by WhatsApp under its own
@@ -116,7 +123,7 @@ export function PrivacyPolicy() {
       </Section>
       <Section title="Access, correction and deletion requests">
         <p>
-          You can review your profile and requests in the student portal. To request access, correction or
+          You can review your profile and requests in your account portal. To request access, correction or
           account deletion, contact ErasePaper by email or WhatsApp using the support details above and
           identify the account you are asking about. An administrator can correct account information and run
           the secure account-deletion process.
@@ -234,7 +241,7 @@ export function CookiePolicy() {
           SameSite=Lax, expire after seven days and are marked Secure in production. Passwords are stored as
           salted one-way hashes; raw passwords and session tokens are not placed in browser storage readable
           by page scripts. The demo is isolated, in-memory, and sends no transactional email; it should not be
-          used with real student information.
+          used with real personal, student or business information.
         </p>
       </Section>
     </LegalPage>
@@ -247,14 +254,22 @@ export function TermsAndConditions() {
     <LegalPage
       eyebrow="Using ErasePaper"
       title="Terms & conditions"
-      intro="These terms describe the current ErasePaper academic-support portal. They should be reviewed by the business operator before use with real students; this page is not legal advice."
+      intro="These terms describe the current ErasePaper services portal. They should be reviewed by the business operator before use with real customers; this page is not legal advice."
     >
-      <Section title="Services and academic integrity">
+      <Section title="Services, marketing outcomes and academic integrity">
         <p>
           ErasePaper offers literature review, research paper and survey paper guidance, plus final-year
-          project mentoring and documentation support. Services are assistance, mentoring, editing and
-          documentation—not completing assessed work on a student's behalf. Students are responsible for their
-          research, implementation, learning and final submissions.
+          project mentoring and documentation support. It also offers Instagram-focused social media
+          management for businesses, including account analysis, performance reports, creative posts and
+          reels, profile optimization, content scheduling, publishing, audience engagement, promotion strategy
+          and ongoing monitoring. Account passwords and verification codes must not be submitted in a request;
+          access arrangements should be agreed separately and securely.
+        </p>
+        <p>
+          Marketing results depend on many factors outside ErasePaper’s control, so no specific reach,
+          engagement, follower growth, leads or sales are guaranteed. Academic services are assistance,
+          mentoring, editing and documentation—not completing assessed work on a student's behalf. Students
+          remain responsible for their research, implementation, learning and final submissions.
         </p>
       </Section>
       <Section title="Service requests and estimates">
@@ -274,7 +289,7 @@ export function TermsAndConditions() {
       </Section>
       <Section title="Requests and account deletion">
         <p>
-          Request status is shown in the portal. Students may cancel a Pending request in the application;
+          Request status is shown in the portal. Users may cancel a Pending request in the application;
           contact support for assistance with other changes. You may ask an administrator to delete your
           account. Deletion removes the local profile, sessions, associated requests and private files;
           operational failures or backups can delay complete removal from every system.
@@ -283,8 +298,8 @@ export function TermsAndConditions() {
       <Section title="Availability and changes">
         <p>
           The portal and its features may change or be temporarily unavailable. ErasePaper does not promise
-          grades, publication, acceptance or a particular academic outcome. Contact ErasePaper for current
-          scope, availability and pricing before relying on a service.
+          grades, publication, acceptance, marketing metrics or a particular business outcome. Contact
+          ErasePaper for current scope, availability and pricing before relying on a service.
         </p>
       </Section>
       <Section title="Contact">

@@ -28,9 +28,10 @@ import { useMobileDrawer } from '../hooks/useMobileDrawer';
 
 const nav = [
   { to: '/admin', label: 'Overview', icon: LayoutDashboard },
-  { to: '/admin/students', label: 'Students', icon: UsersRound },
+  { to: '/admin/students', label: 'Accounts', icon: UsersRound },
   { to: '/admin/control-users', label: 'Control Users', icon: Phone },
   { to: '/admin/requests', label: 'Service requests', icon: Files },
+  { to: '/admin/team', label: 'Our team', icon: UsersRound },
   { to: '/admin/activity', label: 'Activity & audit log', icon: Activity },
   { to: '/admin/analytics', label: 'Website analytics', icon: ChartNoAxesCombined },
   { to: '/admin/settings', label: 'Settings', icon: Settings2 },

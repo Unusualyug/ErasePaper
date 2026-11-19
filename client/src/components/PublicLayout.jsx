@@ -13,6 +13,7 @@ import LegalLinks from './LegalLinks';
 
 const links = [
   ['Services', '/#services'],
+  ['Our Team', '/#team'],
   ['How it works', '/#how-it-works'],
   ['Why ErasePaper', '/#why-us'],
   ['FAQs', '/#faqs'],
@@ -168,8 +169,8 @@ export default function PublicLayout() {
               <Logo />
             </Link>
             <p className="mt-4 max-w-[255px] text-[13px] leading-7 text-slate-500">
-              Thoughtful academic support.
-              <br />A simpler path from idea to submission.
+              Thoughtful academic and business support.
+              <br />A simpler path from idea to next step.
             </p>
             <span className="mt-5 inline-flex items-center gap-1.5 text-[11px] font-medium text-slate-500">
               <ShieldCheck size={14} className="text-brand-600" />
@@ -181,6 +182,9 @@ export default function PublicLayout() {
             <div className="flex flex-col gap-3 text-xs text-slate-500">
               <Link to="/#services" className="hover:text-brand-600">
                 Our services
+              </Link>
+              <Link to="/#team" className="hover:text-brand-600">
+                Our Team
               </Link>
               <Link to="/#how-it-works" className="hover:text-brand-600">
                 How it works

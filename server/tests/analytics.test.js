@@ -61,6 +61,11 @@ test('analytics ranges use Asia/Kolkata boundaries and constrain custom periods'
     key: 'admin-student-details',
     title: 'Admin student details',
   });
+  assert.deepEqual(normalizePage({ path: '/requests/new', serviceSlug: 'social-media-marketing' }), {
+    key: 'social-media-marketing',
+    title: 'Social Media Marketing service',
+  });
+  assert.deepEqual(normalizePage({ path: '/', hash: '#team' }), { key: 'team', title: 'Our Team' });
 });
 
 test('all visits get anonymous page totals while visitor analytics requires consent and reports are admin-only', async () => {

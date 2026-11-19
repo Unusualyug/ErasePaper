@@ -10,6 +10,7 @@ import AnalyticsPageView from '../src/models/AnalyticsPageView.js';
 import AnalyticsSession from '../src/models/AnalyticsSession.js';
 import Service from '../src/models/Service.js';
 import SiteSetting from '../src/models/SiteSetting.js';
+import TeamMember from '../src/models/TeamMember.js';
 import PasswordResetToken from '../src/models/PasswordResetToken.js';
 
 let replSet, connection, store;
@@ -127,6 +128,26 @@ test('local repository enforces username and email uniqueness, allows shared pho
     1,
   );
   assert.equal((await store.requests.list({ page: 1, limit: 10 })).total, 0);
+});
+
+test('Mongo team profile repository creates, updates, lists, and removes profiles', async () => {
+  const created = await store.teamMembers.create({
+    name: 'Ada Lovelace',
+    photoStorageName: 'team-00000000-0000-4000-8000-000000000001.png',
+    photoMimeType: 'image/png',
+    photoUpdatedAt: new Date(),
+  });
+  assert.ok(created._id);
+  assert.equal(created.name, 'Ada Lovelace');
+  assert.equal((await store.teamMembers.list()).length, 1);
+  assert.equal(String((await store.teamMembers.findById(created._id))._id), String(created._id));
+
+  const updated = await store.teamMembers.update(created._id, { name: 'Ada Byron Lovelace' });
+  assert.equal(updated.name, 'Ada Byron Lovelace');
+  const removed = await store.teamMembers.remove(created._id);
+  assert.equal(removed.name, 'Ada Byron Lovelace');
+  assert.equal(await store.teamMembers.findById(created._id), null);
+  assert.equal(await TeamMember.countDocuments(), 0);
 });
 
 test('Mongo reset-token repository replaces, expires, and atomically consumes one hashed token per user', async () => {

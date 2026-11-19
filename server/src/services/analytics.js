@@ -23,6 +23,7 @@ const servicePages = {
   'research-paper': ['research-paper', 'Research Paper service'],
   'survey-paper': ['survey-paper', 'Survey Paper service'],
   'final-year-project': ['final-year-project', 'Final-Year Project service'],
+  'social-media-marketing': ['social-media-marketing', 'Social Media Marketing service'],
 };
 
 export const hashAnalyticsId = (value) => createHash('sha256').update(value).digest('hex');
@@ -154,6 +155,7 @@ export function normalizePage({ path = '/', hash = '', serviceSlug = '' } = {}) 
     const section = String(hash).replace(/^#/, '').toLowerCase();
     const sections = {
       services: ['services', 'Services'],
+      team: ['team', 'Our Team'],
       'how-it-works': ['how-it-works', 'How it works'],
       'why-us': ['why-us', 'Why ErasePaper'],
       faqs: ['faqs', 'FAQs'],

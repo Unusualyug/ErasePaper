@@ -24,16 +24,19 @@ import api, { errorMessage } from '../../lib/api';
 import { useToast } from '../../context/ToastContext';
 const actionLabels = {
   'demo.initialized': 'Demo workspace initialized',
-  'student.registered': 'New student registered',
+  'student.registered': 'New account registered',
   'student.deletion_requested': 'Account deletion requested',
-  'student.database_deleted': 'Student database records removed',
-  'student.deleted': 'Student account securely deleted',
+  'student.database_deleted': 'Account records removed',
+  'student.deleted': 'Account securely deleted',
   'request.created': 'New service request submitted',
   'request.status_updated': 'Request status updated',
   'request.notes_updated': 'Internal request notes updated',
-  'request.cancelled': 'Request cancelled by student',
+  'request.cancelled': 'Request cancelled by requester',
   'admin.role_granted': 'Administrator access granted',
   'site.contact_number_updated': 'Website contact number updated',
+  'team.member_created': 'Public team member added',
+  'team.member_updated': 'Public team member updated',
+  'team.member_deleted': 'Public team member removed',
 };
 export { actionLabels };
 export default function Overview() {
@@ -118,9 +121,7 @@ export default function Overview() {
           <h1 className="text-[29px] font-semibold tracking-[-.035em]">
             Welcome back, {user?.fullName?.split(' ')[0]}.
           </h1>
-          <p className="mt-2 text-xs text-slate-400">
-            Here’s what’s happening in your academic services workspace.
-          </p>
+          <p className="mt-2 text-xs text-slate-400">Here’s what’s happening in your services workspace.</p>
         </div>
         <span className="rounded-lg border border-white/10 bg-white/[.025] px-3 py-2 text-[11px] text-slate-400">
           {formatDate(new Date())}
@@ -130,7 +131,7 @@ export default function Overview() {
         <div className="mb-6 flex items-center gap-2 rounded-lg border border-brand-400/15 bg-brand-500/[.07] px-4 py-3 text-[11px] text-brand-200">
           <Activity size={15} />
           <span>
-            You’re exploring a demo workspace. All students, requests, and statistics below are illustrative.
+            You’re exploring a demo workspace. All accounts, requests, and statistics below are illustrative.
           </span>
         </div>
       )}
@@ -141,7 +142,7 @@ export default function Overview() {
             Account cleanup needs attention
           </h2>
           <p className="mt-2 text-[11px] text-slate-400">
-            Student access is blocked. Remaining cleanup retries automatically; you can also retry now.
+            Account access is blocked. Remaining cleanup retries automatically; you can also retry now.
           </p>
           {data.deletions.map((job) => (
             <div key={job.id} className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs">
@@ -164,10 +165,10 @@ export default function Overview() {
         {[
           [
             UsersRound,
-            'Registered students',
+            'Registered accounts',
             stats.students,
             'text-brand-300',
-            'Your student community',
+            'Your user community',
             '/admin/students',
           ],
           [
@@ -262,7 +263,7 @@ export default function Overview() {
           <div className="mb-6 flex items-center justify-between">
             <div>
               <h2 className="text-sm font-semibold">Requests by service</h2>
-              <p className="mt-1.5 text-[11px] text-slate-500">Where students need your support</p>
+              <p className="mt-1.5 text-[11px] text-slate-500">Where requesters need your support</p>
             </div>
             <Files size={17} className="text-slate-500" />
           </div>
@@ -336,7 +337,7 @@ export default function Overview() {
               <h2 className="text-sm font-semibold">Recently registered</h2>
               <p className="mt-1 text-[11px] text-slate-500">New faces in your community</p>
             </div>
-            <Link to="/admin/students" aria-label="View all students" className="text-brand-300">
+            <Link to="/admin/students" aria-label="View all accounts" className="text-brand-300">
               <ArrowUpRight size={16} />
             </Link>
           </div>
@@ -363,7 +364,7 @@ export default function Overview() {
               to="/admin/students"
               className="flex w-full items-center justify-center gap-2 rounded-lg border border-brand-400/30 py-2.5 text-[11px] font-medium text-brand-300 transition hover:bg-brand-500/10"
             >
-              Manage students
+              Manage accounts
               <ArrowRight size={14} />
             </Link>
           </div>

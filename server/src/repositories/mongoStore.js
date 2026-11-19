@@ -3,6 +3,7 @@ import User from '../models/User.js';
 import ServiceRequest from '../models/ServiceRequest.js';
 import Service from '../models/Service.js';
 import SiteSetting from '../models/SiteSetting.js';
+import TeamMember from '../models/TeamMember.js';
 import Notification from '../models/Notification.js';
 import AdminLog from '../models/AdminLog.js';
 import DeletionJob from '../models/DeletionJob.js';
@@ -54,6 +55,7 @@ export function createMongoStore(connection) {
           ServiceRequest,
           Service,
           SiteSetting,
+          TeamMember,
           Notification,
           AdminLog,
           DeletionJob,
@@ -85,6 +87,7 @@ export function createMongoStore(connection) {
           ServiceRequest,
           Service,
           SiteSetting,
+          TeamMember,
           Notification,
           AdminLog,
           DeletionJob,
@@ -286,6 +289,37 @@ export function createMongoStore(connection) {
       },
       async removeForUser(userId, tx) {
         await ServiceRequest.deleteMany({ userId }, options(tx));
+      },
+    },
+    teamMembers: {
+      async list() {
+        return plain(await TeamMember.find().sort({ createdAt: 1, _id: 1 }).lean());
+      },
+      async findById(id, tx) {
+        if (!mongoose.isValidObjectId(id)) return null;
+        return plain(
+          await TeamMember.findById(id)
+            .session(tx?.session || null)
+            .lean(),
+        );
+      },
+      async create(values, tx) {
+        const [member] = await TeamMember.create([values], options(tx));
+        return plain(member.toObject());
+      },
+      async update(id, values, tx) {
+        if (!mongoose.isValidObjectId(id)) return null;
+        return plain(
+          await TeamMember.findByIdAndUpdate(
+            id,
+            { $set: values },
+            { new: true, runValidators: true, ...options(tx) },
+          ).lean(),
+        );
+      },
+      async remove(id, tx) {
+        if (!mongoose.isValidObjectId(id)) return null;
+        return plain(await TeamMember.findByIdAndDelete(id, options(tx)).lean());
       },
     },
     settings: {

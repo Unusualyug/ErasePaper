@@ -1,6 +1,7 @@
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import request from 'supertest';
+import { readTeamPhoto } from '../src/services/teamPhotos.js';
 import { createMemoryStore } from '../src/repositories/memoryStore.js';
 import { seedDemo } from '../src/services/seedDemo.js';
 import { createApp } from '../src/app.js';
@@ -20,6 +21,15 @@ let store,
   admin,
   createdRequest;
 const cookieFrom = (response) => response.headers['set-cookie'][0].split(';')[0];
+const TEAM_TEST_PNG = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/Wc8AAAAASUVORK5CYII=',
+  'base64',
+);
+const binaryParser = (response, callback) => {
+  const chunks = [];
+  response.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
+  response.on('end', () => callback(null, Buffer.concat(chunks)));
+};
 before(async () => {
   store = createMemoryStore();
   await seedDemo(store);
@@ -64,6 +74,107 @@ test('public configuration is explicitly demo, with the five active services', a
     .post('/api/analytics/aggregate-page-view')
     .send({ path: '/sign-up', serviceSlug: 'social-media-marketing' })
     .expect(204);
+});
+test('homepage team profiles are public while management and photo uploads are admin-only', async () => {
+  const initial = await request(app).get('/api/team').expect(200);
+  assert.deepEqual(initial.body, { members: [] });
+  await request(app).get('/api/admin/team').expect(401);
+  await request(app).get('/api/admin/team').set('Cookie', studentCookie).expect(403);
+  await request(app)
+    .post('/api/admin/team')
+    .set('Cookie', studentCookie)
+    .field('name', 'Not an administrator')
+    .attach('photo', TEAM_TEST_PNG, { filename: 'profile.png', contentType: 'image/png' })
+    .expect(403);
+  await request(app)
+    .post('/api/admin/team')
+    .set('Cookie', adminCookie)
+    .field('name', 'Missing photo')
+    .expect(400);
+  await request(app)
+    .post('/api/admin/team')
+    .set('Cookie', adminCookie)
+    .field('name', 'Unsupported photo')
+    .attach('photo', Buffer.from('not an image'), { filename: 'profile.gif', contentType: 'image/gif' })
+    .expect(400);
+  await request(app)
+    .post('/api/admin/team')
+    .set('Cookie', adminCookie)
+    .field('name', 'Invalid image signature')
+    .attach('photo', Buffer.from('not a PNG'), { filename: 'profile.png', contentType: 'image/png' })
+    .expect(400);
+  const oversized = await request(app)
+    .post('/api/admin/team')
+    .set('Cookie', adminCookie)
+    .field('name', 'Oversized photo')
+    .attach('photo', Buffer.alloc(5 * 1024 * 1024 + 1), {
+      filename: 'oversized.png',
+      contentType: 'image/png',
+    })
+    .expect(400);
+  assert.match(oversized.body.error, /Team photos must be 5 MB or smaller/);
+
+  const created = await request(app)
+    .post('/api/admin/team')
+    .set('Cookie', adminCookie)
+    .field('name', 'Anika Demo')
+    .attach('photo', TEAM_TEST_PNG, { filename: 'anika.png', contentType: 'image/png' })
+    .expect(201);
+  const memberId = created.body.member.id;
+  assert.equal(created.body.member.name, 'Anika Demo');
+  assert.ok(created.body.member.photoUrl.includes(`/api/team/${memberId}/photo?v=`));
+  assert.equal('photoStorageName' in created.body.member, false);
+
+  const publicList = await request(app).get('/api/team').expect(200);
+  assert.equal(publicList.body.members.length, 1);
+  assert.equal(publicList.body.members[0].name, 'Anika Demo');
+  assert.equal(publicList.body.members[0].id, memberId);
+  assert.equal('photoStorageName' in publicList.body.members[0], false);
+  const photo = await request(app)
+    .get(created.body.member.photoUrl)
+    .buffer(true)
+    .parse(binaryParser)
+    .expect(200);
+  assert.equal(photo.headers['content-type'].split(';')[0], 'image/png');
+  assert.equal(photo.headers['cache-control'], 'public, max-age=86400');
+  assert.deepEqual(photo.body, TEAM_TEST_PNG);
+
+  const listedForAdmin = await request(app).get('/api/admin/team').set('Cookie', adminCookie).expect(200);
+  assert.equal(listedForAdmin.body.members[0].name, 'Anika Demo');
+  const oldStorageName = store.data.teamMembers[0].photoStorageName;
+  const renamed = await request(app)
+    .patch(`/api/admin/team/${memberId}`)
+    .set('Cookie', adminCookie)
+    .send({ name: 'Anika Sharma' })
+    .expect(200);
+  assert.equal(renamed.body.member.name, 'Anika Sharma');
+  const replaced = await request(app)
+    .patch(`/api/admin/team/${memberId}`)
+    .set('Cookie', adminCookie)
+    .field('name', 'Anika Sharma')
+    .attach('photo', TEAM_TEST_PNG, { filename: 'anika-new.png', contentType: 'image/png' })
+    .expect(200);
+  const newStorageName = store.data.teamMembers[0].photoStorageName;
+  assert.notEqual(newStorageName, oldStorageName);
+  await assert.rejects(readTeamPhoto(oldStorageName), (error) => error.code === 'NOT_FOUND');
+  assert.ok(replaced.body.member.photoUrl.includes(`/api/team/${memberId}/photo?v=`));
+
+  await request(app)
+    .patch(`/api/admin/team/${memberId}`)
+    .set('Cookie', studentCookie)
+    .send({ name: 'Unauthorized edit' })
+    .expect(403);
+  await request(app).delete(`/api/admin/team/${memberId}`).set('Cookie', studentCookie).expect(403);
+  await request(app).delete(`/api/admin/team/${memberId}`).set('Cookie', adminCookie).expect(200, {
+    removed: true,
+  });
+  assert.deepEqual((await request(app).get('/api/team').expect(200)).body, { members: [] });
+  await request(app).get(replaced.body.member.photoUrl).expect(404);
+  await assert.rejects(readTeamPhoto(newStorageName), (error) => error.code === 'NOT_FOUND');
+
+  const teamLogs = store.data.logs.filter((item) => item.action.startsWith('team.member_'));
+  assert.equal(teamLogs.length, 4);
+  assert.doesNotMatch(JSON.stringify(teamLogs), /Anika|team-/);
 });
 test('public contact number changes are admin-only, confirmed by the API, and audit-log safely', async () => {
   await request(app).get('/api/admin/control-users').expect(401);

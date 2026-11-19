@@ -24,6 +24,7 @@ export function createMemoryStore() {
     passwordResetTokens: [],
     requests: [],
     services: SERVICES.map((s) => ({ ...clone(s), _id: s.slug, active: true })),
+    teamMembers: [],
     siteSettings: {},
     logs: [],
     notifications: [],
@@ -227,6 +228,41 @@ export function createMemoryStore() {
       },
       async removeForUser(userId) {
         data.requests = data.requests.filter((r) => !matchesId(r.userId, userId));
+      },
+    },
+    teamMembers: {
+      async list() {
+        return clone(
+          [...data.teamMembers].sort(
+            (a, b) =>
+              new Date(a.createdAt) - new Date(b.createdAt) || String(a._id).localeCompare(String(b._id)),
+          ),
+        );
+      },
+      async findById(id) {
+        return clone(data.teamMembers.find((member) => matchesId(member._id, id)));
+      },
+      async create(values) {
+        const now = new Date();
+        const member = {
+          _id: newId(),
+          ...clone(values),
+          createdAt: now,
+          updatedAt: now,
+        };
+        data.teamMembers.push(member);
+        return clone(member);
+      },
+      async update(id, values) {
+        const member = data.teamMembers.find((item) => matchesId(item._id, id));
+        if (!member) return null;
+        Object.assign(member, clone(values), { updatedAt: new Date() });
+        return clone(member);
+      },
+      async remove(id) {
+        const index = data.teamMembers.findIndex((member) => matchesId(member._id, id));
+        if (index === -1) return null;
+        return clone(data.teamMembers.splice(index, 1)[0]);
       },
     },
     settings: {
