@@ -15,6 +15,12 @@ test('analytics helpers collapse dynamic paths and keep only approved service/an
   assert.equal(normalizedAnalyticsPath('/admin/students/legacy-account-id'), '/admin/students/:id');
   assert.equal(serviceSlugFromSearch('?service=research-paper'), 'research-paper');
   assert.equal(serviceSlugFromSearch('?service=social-media-marketing'), 'social-media-marketing');
+  for (const slug of [
+    'turnitin-drillbit-ithenticate-reports',
+    'plagiarism-checking-reduction',
+    'ai-content-detection-writing-improvement',
+  ])
+    assert.equal(serviceSlugFromSearch(`?service=${slug}`), slug);
   assert.equal(serviceSlugFromSearch('?service=unknown&email=private@example.com'), undefined);
   assert.equal(safeAnalyticsHash('#services'), '#services');
   assert.equal(safeAnalyticsHash('#team'), '#team');

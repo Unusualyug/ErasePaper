@@ -1,10 +1,32 @@
-import { BookOpen, FileText, ChartNoAxesCombined, GraduationCap } from 'lucide-react';
-export const SERVICE_ICONS = { BookOpen, FileText, ChartNoAxesCombined, GraduationCap };
+import {
+  BookOpen,
+  FileText,
+  ChartNoAxesCombined,
+  GraduationCap,
+  Megaphone,
+  FileSearch,
+  SpellCheck,
+  Bot,
+} from 'lucide-react';
+export const SERVICE_ICONS = {
+  BookOpen,
+  FileText,
+  ChartNoAxesCombined,
+  GraduationCap,
+  Megaphone,
+  FileSearch,
+  SpellCheck,
+  Bot,
+};
 export const SERVICE_COLORS = {
   purple: 'bg-brand-50 text-brand-600',
   blue: 'bg-blue-50 text-blue-600',
   teal: 'bg-teal-50 text-teal-600',
   indigo: 'bg-indigo-50 text-indigo-600',
+  emerald: 'bg-emerald-50 text-emerald-600',
+  sky: 'bg-sky-50 text-sky-600',
+  orange: 'bg-orange-50 text-orange-600',
+  violet: 'bg-violet-50 text-violet-600',
 };
 export const WHATSAPP_NUMBER = import.meta.env?.VITE_WHATSAPP_NUMBER || '919825751614';
 export const normalizeContactNumber = (value) => {
@@ -23,7 +45,7 @@ export const formatPhoneNumber = (number = WHATSAPP_NUMBER) => {
   if (digits.length === 10) return `+91 ${digits.slice(0, 5)} ${digits.slice(5)}`;
   return `+${digits}`;
 };
-export const GENERAL_MESSAGE = 'Hello ErasePaper, I would like to enquire about your academic services.';
+export const GENERAL_MESSAGE = 'Hello ErasePaper, I would like to enquire about your services.';
 export const whatsappUrl = (number = WHATSAPP_NUMBER, message = GENERAL_MESSAGE) =>
   `https://wa.me/${number.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
 export const phoneUrl = (number = WHATSAPP_NUMBER) => `tel:+${number.replace(/\D/g, '')}`;
@@ -70,4 +92,17 @@ export const FIELD_LABELS = {
   college: 'College',
   technology: 'Technology / domain',
   projectStage: 'Project stage',
+  businessName: 'Business or brand name',
+  instagramHandle: 'Instagram business profile',
+  industry: 'Business type or industry',
+  primaryGoal: 'Primary marketing goal',
+  supportNeeded: 'Main support needed',
+  targetAudience: 'Target audience or location',
+  preferredStartDate: 'Preferred start date',
+  preferredPlatform: 'Preferred checking platform',
+  reportType: 'Report support needed',
+  reviewFocus: 'Main support needed',
+  writingGoal: 'Main support needed',
+  detectionTool: 'AI-detection tool or report',
+  authorVoicePreference: 'Voice preference',
 };

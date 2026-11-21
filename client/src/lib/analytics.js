@@ -7,6 +7,9 @@ const SERVICE_SLUGS = new Set([
   'survey-paper',
   'final-year-project',
   'social-media-marketing',
+  'turnitin-drillbit-ithenticate-reports',
+  'plagiarism-checking-reduction',
+  'ai-content-detection-writing-improvement',
 ]);
 
 function createId() {

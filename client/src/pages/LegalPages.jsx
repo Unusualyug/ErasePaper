@@ -50,7 +50,7 @@ export function PrivacyPolicy() {
     <LegalPage
       eyebrow="Privacy"
       title="Privacy policy"
-      intro="This page explains the information ErasePaper processes to provide academic guidance and social-media management and digital marketing services. Use the contact details below to ask a question or request access, correction or deletion."
+      intro="This page explains the information ErasePaper processes to provide academic guidance, document-checking and writing support, and social-media management and digital marketing services. Use the contact details below to ask a question or request access, correction or deletion."
     >
       <Section title="Information we process">
         <p>
@@ -66,10 +66,12 @@ export function PrivacyPolicy() {
           verification codes.
         </p>
         <p>
-          Administrators may add private operational notes to a request. Security and audit records may
-          include account identifiers, request identifiers, action names and timestamps. The application
-          stores a salted, one-way password hash—not your readable password. No phone verification code is
-          requested or sent.
+          For similarity-report, plagiarism-review and AI-writing requests, requirements may include the
+          document type, preferred checking platform, citation style, writing goals and any detection report
+          you choose to provide. Administrators may add private operational notes to a request. Security and
+          audit records may include account identifiers, request identifiers, action names and timestamps. The
+          application stores a salted, one-way password hash—not your readable password. No phone verification
+          code is requested or sent.
         </p>
       </Section>
       <Section title="How we use information">
@@ -258,8 +260,12 @@ export function TermsAndConditions() {
     >
       <Section title="Services, marketing outcomes and academic integrity">
         <p>
-          ErasePaper offers literature review, research paper and survey paper guidance, plus final-year
-          project mentoring and documentation support. It also offers Instagram-focused social media
+          ErasePaper offers literature review, research paper and survey paper guidance, final-year project
+          mentoring, Turnitin, DrillBit and iThenticate report assistance, plagiarism checking and reduction,
+          and AI-content detection with writing improvement. Support may include similarity analysis,
+          matched-source and report explanations, citation and quotation corrections, ethical paraphrasing,
+          and clarity- and voice-focused editing. These services are not for disguising copied or AI-generated
+          work or bypassing academic-integrity checks. ErasePaper also offers Instagram-focused social media
           management for businesses, including account analysis, performance reports, creative posts and
           reels, profile optimization, content scheduling, publishing, audience engagement, promotion strategy
           and ongoing monitoring. Account passwords and verification codes must not be submitted in a request;
@@ -268,15 +274,24 @@ export function TermsAndConditions() {
         <p>
           Marketing results depend on many factors outside ErasePaper’s control, so no specific reach,
           engagement, follower growth, leads or sales are guaranteed. Academic services are assistance,
-          mentoring, editing and documentation—not completing assessed work on a student's behalf. Students
-          remain responsible for their research, implementation, learning and final submissions.
+          mentoring, editing and documentation—not completing assessed work on a student's behalf. Similarity
+          and AI-detection tools can be inaccurate; their results are indicators, not definitive findings, and
+          no particular score, grade, acceptance or publication is promised. Students remain responsible for
+          their research, implementation, learning and final submissions. For Turnitin, DrillBit and
+          iThenticate reports, plagiarism checking and reduction, and AI-content detection and writing
+          improvement, completion is guaranteed within 24 hours after ErasePaper receives the complete
+          document and all required details; the 24-hour period does not start while required materials are
+          missing.
         </p>
       </Section>
       <Section title="Service requests and estimates">
         <p>
           A submitted request records requirements for review and does not by itself constitute an accepted
-          quotation or commitment. The service scope, availability, fees and timelines are confirmed with you
-          before work begins. No online payment integration is currently provided.
+          quotation. For the three document services described above, the guaranteed 24-hour completion period
+          starts only after ErasePaper receives the complete document and all required details; an incomplete
+          request does not start that period. Scope and any fees are discussed and agreed before work begins.
+          For other services, timelines are agreed individually. No online payment integration is currently
+          provided.
         </p>
       </Section>
       <Section title="Accounts and appropriate use">

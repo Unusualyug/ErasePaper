@@ -55,6 +55,9 @@ const pageLabels = {
   'survey-paper': 'Survey Paper service',
   'final-year-project': 'Final-Year Project service',
   'social-media-marketing': 'Social Media Marketing service',
+  'turnitin-drillbit-ithenticate-reports': 'Similarity reports service',
+  'plagiarism-checking-reduction': 'Plagiarism checking and reduction service',
+  'ai-content-detection-writing-improvement': 'AI content and writing review service',
   'bulk-printing': 'Bulk Printing service',
   other: 'Other pages',
 };

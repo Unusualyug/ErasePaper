@@ -23,6 +23,7 @@ export default function NewRequest() {
     services.some((s) => s.slug === params.get('service')) ? params.get('service') : services[0].slug,
   );
   const service = services.find((s) => s.slug === slug) || services[0];
+  const hasCompletionGuarantee = Boolean(service.completionGuarantee);
   const [details, setDetails] = useState({}),
     [files, setFiles] = useState([]),
     [error, setError] = useState(''),
@@ -150,13 +151,24 @@ export default function NewRequest() {
             </h2>
             <div>
               <label htmlFor="title" className="label">
-                Project title or topic <span className="text-brand-500">*</span>
+                {service.slug === 'social-media-marketing'
+                  ? 'Business or campaign name'
+                  : hasCompletionGuarantee
+                    ? 'Document or paper title'
+                    : 'Project title or topic'}{' '}
+                <span className="text-brand-500">*</span>
               </label>
               <input
                 id="title"
                 name="title"
                 className="input"
-                placeholder="Give your request a clear, short title"
+                placeholder={
+                  service.slug === 'social-media-marketing'
+                    ? 'e.g. Your business or upcoming campaign'
+                    : hasCompletionGuarantee
+                      ? 'e.g. Research paper on renewable energy'
+                      : 'Give your request a clear, short title'
+                }
                 required
                 minLength={5}
                 maxLength={160}
@@ -210,6 +222,7 @@ export default function NewRequest() {
                           : field.min
                       }
                       max={field.max}
+                      maxLength={field.type === 'text' ? 300 : undefined}
                       value={details[field.key] || ''}
                       placeholder={field.placeholder || ''}
                       onChange={(e) => setDetails((d) => ({ ...d, [field.key]: e.target.value }))}
@@ -226,14 +239,22 @@ export default function NewRequest() {
                 id="description"
                 name="description"
                 className="input min-h-32"
-                placeholder="Tell us about your requirements, where you are in the process, and the support you’re looking for…"
+                placeholder={
+                  service.slug === 'social-media-marketing'
+                    ? 'Describe your business, target audience, marketing goals, and the account or content support you need…'
+                    : hasCompletionGuarantee
+                      ? 'Tell us what you need reviewed, any relevant requirements or citation rules, and the specific support you’re looking for…'
+                      : 'Tell us about your requirements, where you are in the process, and the support you’re looking for…'
+                }
                 required
                 minLength={20}
                 maxLength={6000}
                 disabled={busy}
               />
               <p className="hint">
-                At least 20 characters. Please don’t include passwords or sensitive personal information.
+                {service.slug === 'social-media-marketing'
+                  ? 'At least 20 characters. Never share Instagram passwords or verification codes here.'
+                  : 'At least 20 characters. Please don’t include passwords or sensitive personal information.'}
               </p>
             </div>
             <div>
@@ -251,8 +272,19 @@ export default function NewRequest() {
             </div>
             <div>
               <label className="label">
-                Supporting documents <span className="font-normal text-slate-400">(optional)</span>
+                {service.slug === 'social-media-marketing'
+                  ? 'Brand assets or reference files'
+                  : hasCompletionGuarantee
+                    ? 'Complete document and relevant report'
+                    : 'Supporting documents'}{' '}
+                <span className="font-normal text-slate-400">(optional)</span>
               </label>
+              {hasCompletionGuarantee && (
+                <p className="hint mb-2">
+                  You can upload the complete document now or provide it after submitting. The 24-hour
+                  completion window starts when we receive the complete document and all required details.
+                </p>
+              )}
               <button
                 type="button"
                 disabled={busy}
@@ -326,8 +358,11 @@ export default function NewRequest() {
                 className="mt-1 h-4 w-4 shrink-0 accent-brand-600"
               />
               <span className="text-[11px] leading-6 text-navy-700">
-                I understand that our services provide academic guidance, mentoring, editing, and
-                documentation support. I remain responsible for my own assessed work.
+                {service.slug === 'social-media-marketing'
+                  ? 'I understand that scope, availability, fees, and timelines are confirmed before work begins, and that no specific marketing results are guaranteed.'
+                  : hasCompletionGuarantee
+                    ? 'I confirm I am authorized to share this document and will use the support to improve my own work and comply with my institution’s rules—not to disguise copied or AI-generated content or bypass academic-integrity checks.'
+                    : 'I understand that our services provide academic guidance, mentoring, editing, and documentation support. I remain responsible for my own assessed work.'}
               </span>
             </label>
             {busy && files.length > 0 && (
@@ -386,6 +421,14 @@ export default function NewRequest() {
             <p className="eyebrow mb-2">Service {service.number}</p>
             <h2 className="text-lg font-bold leading-snug">{service.name}</h2>
             <p className="mt-3 text-xs leading-6 text-slate-500">{service.tagline}</p>
+            {service.completionGuarantee && (
+              <div className="mt-4 rounded-lg border border-emerald-100 bg-emerald-50 p-3">
+                <p className="text-[11px] font-bold text-emerald-800">{service.completionGuarantee.label}</p>
+                <p className="mt-1 text-[10px] leading-5 text-emerald-700">
+                  {service.completionGuarantee.details}
+                </p>
+              </div>
+            )}
             <ul className="mt-5 space-y-3">
               {service.features.map((feature) => (
                 <li key={feature} className="flex items-start gap-2 text-[11px] leading-5 text-slate-500">

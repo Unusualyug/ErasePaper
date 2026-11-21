@@ -39,11 +39,15 @@ import { WhatsAppIcon } from '../components/WhatsAppButton';
 const faqs = [
   [
     'What is ErasePaper?',
-    'ErasePaper supports students with literature review guidance, research papers, survey papers and final-year projects, and helps businesses manage their Instagram presence with analysis, content, strategy and reporting. Create an account, send a request and follow it from your dashboard.',
+    'ErasePaper supports students with literature and research guidance, final-year projects, similarity reports, plagiarism checking and writing improvement, and helps businesses manage their Instagram presence with analysis, content, strategy and reporting. Create an account, send a request and follow it from your dashboard.',
   ],
   [
     'Do you complete assignments or assessed work for students?',
-    'No. Our research and project services provide academic assistance, mentoring, editing, and documentation support. You remain responsible for your own research, learning, implementation, and submission. We do not complete assessed work on your behalf or guarantee grades, acceptance, or publication.',
+    'No. Our research, checking and writing services provide academic assistance, report guidance, editing and documentation support. You remain responsible for your own research, learning and submission. We do not complete assessed work on your behalf, disguise copied or AI-generated content, or help bypass academic-integrity checks. Similarity and AI-detection results are indicators, not guarantees of misconduct or a particular score.',
+  ],
+  [
+    'When does the 1-day completion guarantee start?',
+    'For Turnitin, DrillBit and iThenticate reports, plagiarism checking and reduction, and AI-content detection and writing improvement, completion is guaranteed within 24 hours after we receive your complete document and all required details. Submitting a request without the complete materials does not start the 24-hour window.',
   ],
   [
     'How do I get started?',
@@ -79,6 +83,14 @@ function ServiceCard({ service, index, user, whatsappNumber }) {
             </li>
           ))}
         </ul>
+        {service.completionGuarantee && (
+          <div className="mb-5 rounded-lg border border-emerald-100 bg-emerald-50/80 p-3">
+            <p className="text-[10px] font-bold text-emerald-800">{service.completionGuarantee.label}</p>
+            <p className="mt-1 text-[10px] leading-5 text-emerald-700">
+              {service.completionGuarantee.details}
+            </p>
+          </div>
+        )}
         {service.highlight && (
           <span className="mb-5 w-fit rounded-md bg-orange-50 px-2.5 py-1 text-[10px] font-semibold text-orange-700">
             {service.highlight}
@@ -168,8 +180,8 @@ export default function Home() {
               </span>
             </h1>
             <p className="mt-5 max-w-[435px] text-[14px] leading-[1.8] text-slate-500 sm:mt-8 sm:leading-[1.95]">
-              From research papers, literature reviews and project mentoring to Instagram content, account
-              management and performance reporting, ErasePaper brings academic and business support together.
+              From research guidance, similarity reports and writing improvement to project mentoring and
+              Instagram support, ErasePaper brings academic and business services together.
             </p>
             <div className="hero-actions mt-6 flex flex-wrap gap-3 sm:mt-8">
               <a href="#services" className="btn-primary">
@@ -231,7 +243,7 @@ export default function Home() {
                 <Check size={19} />
               </span>
               <div>
-                <p className="text-[11px] font-bold">5 services. One place.</p>
+                <p className="text-[11px] font-bold">{services.length} services. One place.</p>
                 <p className="mt-0.5 text-[9px] text-slate-400">Less running around. More progress.</p>
               </div>
             </div>
@@ -276,8 +288,8 @@ export default function Home() {
               </h2>
             </div>
             <p className="max-w-[340px] text-[13px] leading-7 text-slate-500">
-              Academic guidance and Instagram-focused support to help students learn and businesses strengthen
-              their online presence.
+              Research guidance, integrity-focused document support and Instagram-focused services for
+              students and businesses.
             </p>
           </Reveal>
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -333,8 +345,8 @@ export default function Home() {
           </div>
           <p className="mt-6 flex items-start justify-center gap-2 text-center text-[10px] leading-relaxed text-slate-400">
             <ShieldCheck size={13} className="shrink-0" />
-            We support your learning. Research and project services are for mentoring, editing, and
-            guidance—not completing assessed work.
+            We support your learning with guidance, document review and editing—not assessed-work completion
+            or help bypassing academic-integrity checks.
           </p>
         </div>
       </section>
@@ -408,7 +420,7 @@ export default function Home() {
                 [
                   Layers3,
                   'Everything, together',
-                  'Research, writing, project mentoring and Instagram-focused business support in one workspace.',
+                  'Research and project mentoring, document checking and writing improvement, plus Instagram-focused business support in one workspace.',
                 ],
                 [
                   FileCheck2,
